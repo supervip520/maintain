@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.maint.permission.mapper.IDbPermissionMapper">
+	 <select id="queryAll" resultType="java.util.HashMap">
+        SELECT id,text,parentId "parentid",plevel "level",url "href",icon,menuType from db_permission where menuType='1'
+    </select>
+    
+    <select id="queryList" resultType="DbPermission">
+    	
+    	select * from db_permission
+    </select>
+    
+ <select id="findByUserName" resultType="DbPermission">
+	select p.* from dbo.db_role  r
+	left join  dbo.db_user_role ur on(r.id = ur.roleId) 
+	left join dbo.db_user  u on(u.id = ur.userId)
+	left join  dbo.db_permission_role rp on(rp.roleid = r.id) 
+	left join dbo.db_permission  p on(p.id = rp.permissionId ) 
+	where u.user_account = #{userName}
+</select>
+    
+</mapper>

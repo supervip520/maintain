@@ -1,0 +1,561 @@
+﻿<!DOCTYPE HTML>
+<html lang="zh-cn" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro" >
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>配件统计列表</title>
+<base href="/static">
+<link href="plugins/bootstrap-3.3.0/css/bootstrap.min.css" rel="stylesheet" />
+<link href="plugins/material-design-iconic-font-2.2.0/css/material-design-iconic-font.min.css" rel="stylesheet" />
+<link href="plugins/bootstrap-3.3.0/css/bootstrap-select.min.css" rel="stylesheet" />
+<link href="plugins/bootstrap-table-1.11.0/bootstrap-table.min.css" rel="stylesheet" />
+<link href="plugins/bootstrap-3.3.0/css/bootstrapValidator.css" rel="stylesheet" />
+<link href="plugins/waves-0.7.5/waves.min.css" rel="stylesheet" />
+<link href="plugins/jquery-confirm/jquery-confirm.min.css" rel="stylesheet" />
+<link href="css/common.css" rel="stylesheet" />
+<link href="css/table.css" rel="stylesheet" />
+<link href="css/toastr.css" rel="stylesheet" />
+</head>
+<body>
+	
+	<div id="main">
+		<div id="toolbar">
+			<a class="btn btn-primary" href="javascript:;" shiro:hasPermission="system:dict:add"
+				onclick="createAction()"><i class="zmdi zmdi-plus"></i> 新增配件</a> <a
+				class="btn btn-primary" href="javascript:;" shiro:hasPermission="system:dict:edit"
+				onclick="updateAction()"><i class="zmdi zmdi-edit"></i> 编辑配件</a> <a
+				class="btn btn-primary" href="javascript:;" shiro:hasPermission="system:dict:del"
+				onclick="deleteAction()"><i class="zmdi zmdi-close"></i> 删除配件</a>
+		</div>
+		<table id="table" class="table-hover"></table>
+	</div>
+	<!-- 新增 -->
+	<div class="modal fade bs-example-modal-md" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="addStatiticsModal" data-backdrop="static">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">录入配件</h4>
+            </div>
+            <div class="modal-body">
+                <form  id="addFormStatistics" class="form-horizontal">
+                    <div class="form-group" style="text-align: center;">
+                    <div class="col-md-6 col-xs-12">
+                    		<strong>配件名称:</strong><br>
+                         <input id="addstatisticsName" name="statisticsName" type="text"  class="form-control">
+                     </div>  
+                     <div class="col-md-6 col-xs-12">
+                     
+                     <strong>配件总数:</strong><br>
+                    <input id="addstatisticsNumber"  name="statisticsNumber" value="0" type="number"
+					class="form-control">
+                     </div> 
+                        
+                    </div>
+                    <div class="form-group" style="text-align: center;">
+                     <div class="col-md-6 col-xs-12">
+                    		<strong>配件使用:</strong>
+                      <input id="addstatisticsEmp"  value="0" name="statisticsEmp" onblur="check(this.value)" type="number" class="form-control">
+                     </div> 
+                     <div class="col-md-6 col-xs-12">
+                    		<strong>设备厂家:</strong>
+                    		<input id="addsupplierName"  name="supplierName" type="text" class="form-control">
+                     </div> 
+                    </div>
+                    
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="savaStatistics">保存</button>
+                 <button type="button" class="btn btn-default" id="closeModal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+	
+	<!-- 修改 -->
+	<div class="modal fade bs-example-modal-md" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="updStatisticsModal" data-backdrop="static">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" >编辑配件</h4>
+            </div>
+            <div class="modal-body">
+                <form  id="updFormStatistics" class="form-horizontal">
+                    <div class="form-group" style="text-align: center;">
+                    <div class="col-md-6 col-xs-12">
+                    		<strong>配件名称:</strong><br>
+                    		<input id="updstatisticsId" name="statisticsId" type="hidden"/>
+                         <input id="updstatisticsName" name="statisticsName" type="text"  class="form-control">
+                     </div>  
+                     <div class="col-md-6 col-xs-12">
+                     
+                     <strong>配件总数:</strong><br>
+                    <input id="updstatisticsNumber"  name="statisticsNumber" value="0" type="number"
+					class="form-control">
+                     </div> 
+                        
+                    </div>
+                    <div class="form-group" style="text-align: center;">
+                     <div class="col-md-6 col-xs-12">
+                    		<strong>配件使用:</strong>
+                      <input id="updstatisticsEmp"  value="0" name="statisticsEmp" onblur="updcheck(this.value)" type="number" class="form-control">
+                     </div> 
+                     <div class="col-md-6 col-xs-12">
+                    		<strong>设备厂家:</strong>
+                    		<input id="updsupplierName"  name="supplierName" type="text" class="form-control">
+                     </div> 
+                    </div>
+                    
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="updStatistics">保存</button>
+                 <button type="button" class="btn btn-default" id="updcloseModal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+	
+	
+	
+	<section id="content">
+		<div class="content_tab">
+			<ul id="tabs" class="tabs">
+			</ul>
+		</div>
+		<div class="content_main">
+			<div id="iframe_home" class="iframe cur">
+			</div>
+		</div>
+	</section>
+	<script src="plugins/jquery.1.12.4.min.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/bootstrap.min.js"></script>
+	<script src="plugins/bootstrap-table-1.11.0/bootstrap-table.min.js"></script>
+	<script src="plugins/bootstrap-table-1.11.0/locale/bootstrap-table-zh-CN.min.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/bootstrap-select.min.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/defaults-zh_CN.min.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/bootstrapValidator.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/zh_CN.js"></script>
+	<script src="plugins/waves-0.7.5/waves.min.js"></script>
+	<script src="plugins/jquery-confirm/jquery-confirm.min.js"></script>
+	<script src="js/toastr.min.js"></script>
+	<script src="js/common.js"></script>
+	<script>
+	toastr.options.positionClass = 'toast-top-center';
+    var addform = $('#addFormStatistics');
+    var updform = $('#updFormStatistics');
+    $(document).ready(function () {
+
+    	addform.bootstrapValidator({
+            message: '输入值不合法',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+            	statisticsName: {
+                    validators: {
+                        notEmpty: {
+                            message: '配件名称不能为空'
+                        },
+                        stringLength: {
+                            max: 10,
+                            message: '请输入1到10个字符'
+                        }
+                    }
+                },
+                statisticsEmp: {
+                    validators: {
+                        notEmpty: {
+                            message: '配件使用量不能超过总数'
+                        }
+                    }
+                },
+                supplierName: {
+                    validators: {
+                        notEmpty: {
+                            message: '设备厂家不能为空'
+                        }
+                    }
+                }
+            }
+        });
+    	updform.bootstrapValidator({
+            message: '输入值不合法',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+            	statisticsName: {
+                    validators: {
+                        notEmpty: {
+                            message: '配件名称不能为空'
+                        },
+                        stringLength: {
+                            max: 10,
+                            message: '请输入1到10个字符'
+                        }
+                    }
+                },
+                statisticsEmp: {
+                    validators: {
+                        notEmpty: {
+                            message: '配件使用量不能超过总数'
+                        }
+                    }
+                },
+                supplierName: {
+                    validators: {
+                        notEmpty: {
+                            message: '设备厂家不能为空'
+                        }
+                    }
+                }
+            }
+        });
+    });
+	
+	
+	
+	
+	
+	
+		var $table = $('#table');
+		$(function() {
+			$(document).on('focus', 'input[type="text"]', function() {
+				$(this).parent().find('label').addClass('active');
+			}).on('blur', 'input[type="text"]', function() {
+				if ($(this).val() == '') {
+					$(this).parent().find('label').removeClass('active');
+				}
+			});
+			
+			
+			// bootstrap table初始化
+			$table.bootstrapTable({
+				url : '/dict/listStatistics',
+				height : getHeight(),
+				striped : true,
+				search : true,
+				searchOnEnterKey : true,
+				showRefresh : true,
+				showToggle : false,
+				showColumns : false,
+				minimumCountColumns : 2,
+				showPaginationSwitch : false,
+				clickToSelect : true,
+				cardView: false,			//是否显示详细视图
+				 detailView: false,          //是否显示父子表
+				detailFormatter : 'detailFormatter',
+				pagination : true,
+				paginationLoop : false,
+				classes : 'table table-hover table-no-bordered',
+				smartDisplay : false,
+				idField : 'statisticsId',
+				sortName : 'statisticsId',
+				sortOrder : 'desc',
+				escape : true,
+				searchOnEnterKey : true,
+				maintainSelected : true,
+				toolbar : '#toolbar',
+				columns : [ {
+					field : 'state',
+					checkbox : true
+				},{
+					field : 'statisticsId',
+					title : '编号',
+					 visible: false
+				},{
+					field : 'statisticsName',
+					title : '配件名称',
+					sortable : true,
+					halign : 'center'
+				},{
+					field : 'statisticsNumber',
+					title : '配件总数',
+					sortable : true,
+					halign : 'center'
+				} ,{
+					field : 'statisticsEmp',
+					title : '配件使用',
+					sortable : true,
+					halign : 'center'
+				},{
+					field : 'statisticsSyu',
+					title : '配件剩余',
+					sortable : true,
+					halign : 'center',
+					formatter: function (value, row, index) {
+	                    if(value<=3)
+	                    {
+	                 return '<strong style="color:red;">'+value+'</strong>'  	
+	                    }else{
+	                    	return value;
+	                    }
+	                }
+				}
+				]
+			}).on('all.bs.table', function(e, name, args) {
+				$('[data-toggle="tooltip"]').tooltip();
+				$('[data-toggle="popover"]').popover();
+			});
+			
+		//定时30s自动刷新	
+		/* 	setInterval(function () {
+				$("#table").bootstrapTable('refresh');
+            }, 1000 * 30); */
+			
+		});
+		function detailFormatter(index, row) {
+			var html = [];
+			$.each(row, function(key, value) {
+				html.push('<p><b>' + key + ':</b> ' + value + '</p>');
+			});
+			return html.join('');
+		}
+		// 新增
+		function createAction() {
+			$("#addStatiticsModal").modal();
+			
+		}
+		// 编辑
+		function updateAction() {
+			var rows = $table.bootstrapTable('getSelections');
+			if (rows.length == 0) {
+				$.confirm({
+					title : false,
+					content : '请至少选择一条记录！',
+					autoClose : 'cancel|3000',
+					backgroundDismiss : true,
+					buttons : {
+						cancel : {
+							text : '取消',
+							btnClass : 'waves-effect waves-button'
+						}
+					}
+				});
+			}else if(rows.length >1){
+				
+				$.confirm({
+					title : false,
+					content : '最多选择一条记录！',
+					autoClose : 'cancel|3000',
+					backgroundDismiss : true,
+					buttons : {
+						cancel : {
+							text : '取消',
+							btnClass : 'waves-effect waves-button'
+						}
+					}
+				});
+				
+			}else{
+				$("#updstatisticsId").val(rows[0].statisticsId);
+				$("#updstatisticsName").val(rows[0].statisticsName);
+				$("#updstatisticsNumber").val(rows[0].statisticsNumber);
+				$("#updstatisticsEmp").val(rows[0].statisticsEmp);
+				$("#updsupplierName").val(rows[0].supplierName);
+				
+				$("#updStatisticsModal").modal();
+			}
+		}
+		// 删除
+		function deleteAction() {
+			var rows = $table.bootstrapTable('getSelections');
+			if (rows.length == 0) {
+				$.confirm({
+					title : false,
+					content : '请至少选择一条记录！',
+					autoClose : 'cancel|3000',
+					backgroundDismiss : true,
+					buttons : {
+						cancel : {
+							text : '取消',
+							btnClass : 'waves-effect waves-button'
+						}
+					}
+				});
+			} else {
+				$.confirm({
+					type : 'red',
+					animationSpeed : 300,
+					title : false,
+					content : '确认删除该配件吗？',
+					buttons : {
+						confirm : {
+							text : '确认',
+							btnClass : 'waves-effect waves-button',
+							action : function() {
+								for (var i = rows.length - 1; i >= 0; i--) {
+									var statistics = {};
+									statistics.statisticsId = rows[i].statisticsId;
+									$.ajax({
+										type : "POST",
+										url : "/dict/deleteStatistics",
+										async : true,
+										contentType : "application/json",
+										data : JSON.stringify(statistics),
+										success : function(result) {
+											if (result["msg"] == "删除成功") {
+												$("#table").bootstrapTable('refresh');
+											} else {
+												toastr.error('删除失败');
+											}
+										}
+									});
+								}
+							}
+						},
+						cancel : {
+							text : '取消',
+							btnClass : 'waves-effect waves-button'
+						}
+					}
+				});
+			}
+		}
+		//关闭模态框
+		$("#closeModal").click(function () {
+            $("#addStatiticsModal").modal("hide");
+            //关闭模态框后清空填写的数据
+            document.getElementById("addFormStatistics").reset();
+    });
+		
+		//关闭修改模态框
+		$("#updcloseModal").click(function () {
+            $("#updStatisticsModal").modal("hide");
+            //关闭模态框后清空填写的数据
+            document.getElementById("updFormStatistics").reset();
+    });
+		//录入
+		$("#savaStatistics").click(function () {
+			var statistics = {};
+			statistics.statisticsName =$("#addstatisticsName").val();
+			statistics.statisticsNumber =$("#addstatisticsNumber").val();
+			statistics.statisticsEmp =$("#addstatisticsEmp").val();
+			statistics.supplierName =$("#addsupplierName").val();
+			if(statistics.statisticsName=="")
+			{
+			$("#addstatisticsName").focus();
+			return false;
+			}
+	    	 $.ajax({
+	    	        //接口地址
+	    	        url: '/dict/addStatistics',
+	    	        type: 'POST',
+	    	        data : JSON.stringify(statistics),
+	    	        contentType : "application/json",
+	    	        success: function (result) {
+	    	        	if (result["msg"] == "配件添加成功"){
+	    	        		toastr.success('添加成功');
+	    	        		$("#table").bootstrapTable('refresh');
+		    	        	$("#addStatiticsModal").modal("hide");
+		    	        	 document.getElementById("addFormStatistics").reset();
+						}else{
+							toastr.error('添加失败');
+							$("#table").bootstrapTable('refresh');
+		    	        	$("#addStatiticsModal").modal("hide");
+		    	        	 document.getElementById("addFormStatistics").reset();
+							}
+							return false;
+					
+	    	        
+	    	        },
+	    	        error: function (returndata) {
+		    	           //请求异常的回调
+		    	          toastr.error('网络访问失败，请稍后重试!');
+		    	           $("#addStatiticsModal").modal("hide");
+			                //关闭模态框后清空填写的数据
+			                document.getElementById("addFormStatistics").reset();
+		    	        }
+	    	    });
+		});
+		
+		
+		
+		
+		//修改
+		$("#updStatistics").click(function () {
+			var statistics = {};
+			statistics.statisticsId =$("#updstatisticsId").val();
+			statistics.statisticsName =$("#updstatisticsName").val();
+			statistics.statisticsNumber =$("#updstatisticsNumber").val();
+			statistics.statisticsEmp =$("#updstatisticsEmp").val();
+			statistics.supplierName =$("#updsupplierName").val();
+			if(statistics.statisticsName=="")
+			{
+			$("#updstatisticsId").focus();
+			return false;
+			}
+	    	 $.ajax({
+	    	        //接口地址
+	    	        url: '/dict/updateStatistics',
+	    	        type: 'POST',
+	    	        data : JSON.stringify(statistics),
+	    	        contentType : "application/json",
+	    	        success: function (result) {
+	    	        	if (result["msg"] == "配件修改成功"){
+	    	        		 toastr.success('修改成功');
+	    	        		$("#table").bootstrapTable('refresh');
+		    	        	$("#updStatisticsModal").modal("hide");
+		    	        	 document.getElementById("updFormStatistics").reset();
+		    	        	
+		    	        		
+						}else{
+							toastr.error('修改失败');
+							$("#table").bootstrapTable('refresh');
+		    	        	$("#updStatisticsModal").modal("hide");
+		    	        	 document.getElementById("updFormStatistics").reset();
+							}
+
+	    	        },
+	    	        error: function (returndata) {
+		    	           //请求异常的回调
+		    	           // modals.warn("网络访问失败，请稍后重试!");
+		    	          toastr.error('网络访问失败，请稍后重试!');
+		    	           $("#updStatisticsModal").modal("hide");
+			                //关闭模态框后清空填写的数据
+		    	           document.getElementById("updFormStatistics").reset();
+		    	        }
+	    	    });
+		});
+		
+		function check(value)
+		{
+		var countNum=$("#addstatisticsNumber").val();
+		if(parseInt(value)>parseInt(countNum))
+			{
+			toastr.warning('配件使用数不能大于配件总数');
+			$("#addstatisticsEmp").val(0);
+			}
+		
+		}
+		function updcheck(value)
+		{
+		var countNum=$("#updstatisticsNumber").val();
+		if(parseInt(value)>parseInt(countNum))
+			{
+			toastr.warning('配件使用数不能大于配件总数');
+			$("#updstatisticsEmp").val(0);
+			}
+		
+		}
+		
+		$('#addStatiticsModal').on('hide.bs.modal', function () {
+			 document.getElementById("addFormStatistics").reset();
+	        
+	   });
+		$('#updStatisticsModal').on('hide.bs.modal', function () {
+			 document.getElementById("updFormStatistics").reset();
+	        
+	   });
+	</script>
+	
+</body>
+</html>

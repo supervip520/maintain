@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Implementation-Title: Maint
+Implementation-Version: 0.0.1-SNAPSHOT
+Built-By: 93552
+Implementation-Vendor-Id: com
+Build-Jdk: 1.8.0_77
+Implementation-URL: https://projects.spring.io/spring-boot/#/spring-bo
+ ot-starter-parent/Maint
+Created-By: Maven Integration for Eclipse
+

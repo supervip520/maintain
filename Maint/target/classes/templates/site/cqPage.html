@@ -1,0 +1,861 @@
+﻿<!DOCTYPE HTML>
+<html lang="zh-cn" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>站点列表</title>
+<base href="/static">
+<link href="plugins/bootstrap-3.3.0/css/bootstrap.min.css" rel="stylesheet" />
+<link href="plugins/material-design-iconic-font-2.2.0/css/material-design-iconic-font.min.css" rel="stylesheet" />
+<link href="plugins/bootstrap-3.3.0/css/bootstrap-select.min.css" rel="stylesheet" />
+<link href="plugins/bootstrap-table-1.11.0/bootstrap-table.min.css" rel="stylesheet" />
+<link href="plugins/bootstrap-3.3.0/css/bootstrapValidator.css" rel="stylesheet" />
+<link href="plugins/waves-0.7.5/waves.min.css" rel="stylesheet" />
+<link href="plugins/jquery-confirm/jquery-confirm.min.css" rel="stylesheet" />
+<link href="css/common.css" rel="stylesheet" />
+<link href="css/toastr.css" rel="stylesheet" />
+<link href="css/table.css" rel="stylesheet" />
+</head>
+<body>
+	
+	<div id="main">
+		<div id="toolbar">
+			<a class="btn btn-primary" shiro:hasPermission="site:cssh:add" href="javascript:;"
+				onclick="createAction()"><i class="zmdi zmdi-plus"></i> 新增站点</a> <a
+				class="btn btn-primary"  shiro:hasPermission="site:cssh:edit"    href="javascript:;"
+				onclick="updateAction()"><i class="zmdi zmdi-edit"></i> 编辑站点</a> <a
+				class="btn btn-primary"   shiro:hasPermission="site:cssh:del"   href="javascript:;"
+				onclick="deleteAction()"><i class="zmdi zmdi-close"></i> 删除站点</a>
+		</div>
+		<table id="table" class="table-hover"></table>
+	</div>
+	
+	
+	
+	
+	
+	
+	<!-- 新增 -->
+	<div class="modal fade bs-example-modal-md" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="addSiteModal" data-backdrop="static">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">录入站点</h4>
+            </div>
+            <div class="modal-body">
+                <form  id="addFormSite" class="form-horizontal">
+                    <div class="form-group" style="text-align: center;">
+                    <div class="col-md-6 col-xs-12">
+                    		<strong>站点名称:</strong><br>
+                         <input id="addsiteName" name="siteName" required="required"
+					type="text" class="form-control">
+                     </div>  
+                     <div class="col-md-6 col-xs-12">
+                     
+                     <strong>站点地址:</strong><br>
+                    <input id="addsiteAddress" name="siteAddress" type="text"
+					class="form-control">
+                     </div> 
+                        
+                    </div>
+                    <div class="form-group" style="text-align: center;">
+                     <div class="col-md-6 col-xs-12">
+                    		<strong>经度:</strong>
+                      <input id="addjd" name="jd" type="text" class="form-control">
+                     </div> 
+                     <div class="col-md-6 col-xs-12">
+                    		<strong>纬度:</strong>
+                    		<input id="addwd" name="wd" type="text" class="form-control">
+                     </div> 
+                    </div>
+                    
+                    <div class="form-group" style="text-align: center;">
+                     
+                     <div class="col-md-6 col-xs-12">
+                      <strong>站点类型:</strong>
+                    <select id="siteTypeName" name="siteTypeName"   class="selectpicker" data-width="100%"></select>
+                     </div> 
+                     <div class="col-md-6 col-xs-12">
+                    		<strong>河流名称:</strong>
+                    		<input id="addriversName" name="riversName" type="text" class="form-control">
+                     </div> 
+                    </div>
+                     <div class="form-group" style="text-align: center;">
+                    <div class="col-md-6 col-xs-12">
+                    		<strong>设备厂家:</strong>
+                        <input id="addequipment" name="equipment" type="text" class="form-control">
+                     </div>  
+                     <div class="col-md-6 col-xs-12">
+                    		<strong>备注:</strong>
+                    		 <input id="addremark" type="text" name="remark" class="form-control">
+                     </div> 
+                    </div>
+                    
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="savaSite">保存</button>
+                 <button type="button" class="btn btn-default" id="closeModal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+	
+	<!-- 修改 -->
+	<div class="modal fade bs-example-modal-md" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="updSiteModal" data-backdrop="static">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">编辑站点</h4>
+            </div>
+            <div class="modal-body">
+                <form  id="updFormSite" class="form-horizontal">
+                    <div class="form-group" style="text-align: center;">
+                    <div class="col-md-6 col-xs-12">
+                    		<strong>站点名称:</strong><br>
+                    		<input id="updsiteId" name="siteId" type="hidden"/>
+                         <input id="updsiteName" name="siteName" type="text" class="form-control">
+                     </div>  
+                     <div class="col-md-6 col-xs-12">
+                     
+                     <strong>站点地址:</strong><br>
+                    <input id="updsiteAddress" name="siteAddress" type="text"
+					class="form-control">
+                     </div> 
+                        
+                    </div>
+                    <div class="form-group" style="text-align: center;">
+                     <div class="col-md-6 col-xs-12">
+                    		<strong>经度:</strong>
+                      <input id="updjd" name="jd" type="text" class="form-control">
+                     </div> 
+                     <div class="col-md-6 col-xs-12">
+                    		<strong>纬度:</strong>
+                    		<input id="updwd" name="wd" type="text" class="form-control">
+                     </div> 
+                    </div>
+                    
+                    <div class="form-group" style="text-align: center;">
+                     
+                     <div class="col-md-6 col-xs-12">
+                      <strong>站点类型:</strong>
+                    <select id="updsiteTypeName" name="siteTypeName"   class="selectpicker" data-width="100%"></select>
+                     </div> 
+                     <div class="col-md-6 col-xs-12">
+                    		<strong>河流名称:</strong>
+                    		<input id="updriversName" name="riversName" type="text" class="form-control">
+                     </div> 
+                    </div>
+                     <div class="form-group" style="text-align: center;">
+                    <div class="col-md-6 col-xs-12">
+                    		<strong>设备厂家:</strong>
+                        <input id="updequipment" name="equipment" type="text" class="form-control">
+                     </div>  
+                     <div class="col-md-6 col-xs-12">
+                    		<strong>备注:</strong>
+                    		 <input id="updremark" type="text" name="remark" class="form-control">
+                     </div> 
+                    </div>
+                    
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="updSite">保存</button>
+                 <button type="button" class="btn btn-default" id="updcloseModal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+	
+	
+	
+	<section id="content">
+		<div class="content_tab">
+			<ul id="tabs" class="tabs">
+			</ul>
+		</div>
+		<div class="content_main">
+			<div id="iframe_home" class="iframe cur">
+			</div>
+		</div>
+	</section>
+	<script src="plugins/jquery.1.12.4.min.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/bootstrap.min.js"></script>
+	<script src="plugins/bootstrap-table-1.11.0/bootstrap-table.min.js"></script>
+	<script src="plugins/bootstrap-table-1.11.0/locale/bootstrap-table-zh-CN.min.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/bootstrap-select.min.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/defaults-zh_CN.min.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/bootstrapValidator.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/zh_CN.js"></script>
+	<script src="plugins/waves-0.7.5/waves.min.js"></script>
+	<script src="plugins/jquery-confirm/jquery-confirm.min.js"></script>
+	<script src="plugins/export/bootstrap-table-export.js"></script>
+	<script src="plugins/export/tableExport.js"></script>
+	<script src="plugins/export/jquery.base64.js"></script>
+		<script src="js/toastr.min.js"></script>
+	<script src="js/common.js"></script>
+	<script>
+	toastr.options.positionClass = 'toast-top-center';
+	var addform = $('#addFormSite');
+	  var updform = $('#updFormSite');
+	  
+	  $(document).ready(function () {
+
+	    	addform.bootstrapValidator({
+	            message: '输入值不合法',
+	            feedbackIcons: {
+	                valid: 'glyphicon glyphicon-ok',
+	                invalid: 'glyphicon glyphicon-remove',
+	                validating: 'glyphicon glyphicon-refresh'
+	            },
+	            fields: {
+	            	siteName: {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '站点名称不能为空'
+	                        },
+	                        stringLength: {
+	                            max: 10,
+	                            message: '请输入1到10个字符'
+	                        }
+	                    }
+	                },
+	                siteAddress: {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '站点地址不能为空'
+	                        }
+	                    }
+	                },
+	                jd: {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '经度不能为空'
+	                        }
+	                    }
+	                },
+	                wd: {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '纬度不能为空'
+	                        }
+	                    }
+	                },
+	                siteTypeName: {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '站点类型不能为空'
+	                        }
+	                    }
+	                },
+	                riversName: {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '河流名称不能为空'
+	                        }
+	                    }
+	                },
+	                equipment: {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '设备厂家不能为空'
+	                        }
+	                    }
+	                }
+	            }
+	        });
+	    	updform.bootstrapValidator({
+	            message: '输入值不合法',
+	            feedbackIcons: {
+	                valid: 'glyphicon glyphicon-ok',
+	                invalid: 'glyphicon glyphicon-remove',
+	                validating: 'glyphicon glyphicon-refresh'
+	            },
+	            fields: {
+	            	siteName: {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '站点名称不能为空'
+	                        },
+	                        stringLength: {
+	                            max: 10,
+	                            message: '请输入1到10个字符'
+	                        }
+	                    }
+	                },
+	                siteAddress: {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '站点地址不能为空'
+	                        }
+	                    }
+	                },
+	                jd: {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '经度不能为空'
+	                        }
+	                    }
+	                },
+	                wd: {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '纬度不能为空'
+	                        }
+	                    }
+	                },
+	                siteTypeName: {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '站点类型不能为空'
+	                        }
+	                    }
+	                },
+	                riversName: {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '河流名称不能为空'
+	                        }
+	                    }
+	                },
+	                equipment: {
+	                    validators: {
+	                        notEmpty: {
+	                            message: '设备厂家不能为空'
+	                        }
+	                    }
+	                }
+	            }
+	        });
+	    });
+	
+		var $table = $('#table');
+		$(function() {
+			$(document).on('focus', 'input[type="text"]', function() {
+				$(this).parent().find('label').addClass('active');
+			}).on('blur', 'input[type="text"]', function() {
+				if ($(this).val() == '') {
+					$(this).parent().find('label').removeClass('active');
+				}
+			});
+			
+	
+			// bootstrap table初始化
+			$table.bootstrapTable({
+				url : '/site/listSiteCq',
+				height : getHeight(),
+				striped : true,
+				search : true,
+				searchOnEnterKey : true,
+				showRefresh : true,
+				showToggle : false,
+				showColumns : true,
+				minimumCountColumns : 2,
+				showPaginationSwitch : false,
+				clickToSelect : true,
+				detailView : false,
+				detailFormatter : 'detailFormatter',
+				pagination : true,
+				paginationLoop : false,
+				classes : 'table table-hover table-no-bordered',
+				//sidePagination: 'server',
+				//silentSort: false,
+				smartDisplay : false,
+				idField : 'sid',
+				sortName : 'maintainDate',
+				sortOrder : 'desc',
+				escape : true,
+				searchOnEnterKey : true,
+				idField : 'systemId',
+				maintainSelected : true,
+				toolbar : '#toolbar',
+				//导出功能设置（关键代码）
+				exportDataType:'all',//'basic':当前页的数据, 'all':全部的数据, 'selected':选中的数据
+				showExport: true,  //是否显示导出按钮
+			    buttonsAlign:"right",  //按钮位置
+			    showExport: phoneOrPc(),
+			    exportTypes:['excel','xlsx'],  //导出文件类型，[ 'csv', 'txt', 'sql', 'doc', 'excel', 'xlsx', 'pdf']
+			    exportOptions: {//导出设置
+                    fileName: '城区(山洪)',//下载文件名称
+                    ignoreColumn: [0]
+                },
+				columns : [ {
+					field : 'state',
+					checkbox : true
+				},{
+					field : 'sid',
+					title : '编号',
+					visible: false
+				},{
+					field : 'siteId',
+					title : '站点编号',
+					sortable : true,
+					halign : 'center'
+				},{
+					field : 'siteName',
+					title : '站点名称',
+					sortable : true,
+					halign : 'center',
+				},{
+					field : 'siteAddress',
+					title : '站点地址',
+					sortable : true,
+					halign : 'center'
+				}, {
+					field : 'riversName',
+					title : '河流名称',
+					sortable : true,
+					halign : 'center'
+				}, {
+					field : 'equipment',
+					title : '设备厂家',
+					sortable : true,
+					halign : 'center'
+				},{
+					field : 'remark',
+					title : '备注',
+					sortable : true,
+					halign : 'center'
+				}, {
+					field : 'maintainDate',
+					title : '维护日期',
+					sortable : true,
+					halign : 'center',
+					formatter: function (value, row, index) {
+	                    return changeDateFormat(value)
+	                }
+				},{
+					field : 'dayDiff',
+					title : '至今未维护天数',
+					sortable : true,
+					halign : 'center',
+					formatter: function (value, row, index) {
+	                    return dayDiff(row.maintainDate)
+	                }
+				},{
+					field : 'maintainsId',
+					title : '维护情况',
+					halign : 'center',
+					align : 'center',
+					visible: false,
+					formatter: function (value, row, index) {
+						if(value=='0')
+						{
+						return '<label>未维护</label>';
+						}else if(value=='1'){
+							return '<label color="red">已维护</label>';
+						}else if(value=='2'){
+							return '<label color="red">未解决</label>';
+						}else{	
+							return '<label color="red">已维护</label>';
+						}
+	                }
+				},{
+					field : 'maintainsId',
+					title : '维护情况',
+					halign : 'center',
+					align : 'center',
+					formatter : 'actionFormatter',
+					clickToSelect : false
+				}  ]
+			}).on('all.bs.table', function(e, name, args) {
+				$('[data-toggle="tooltip"]').tooltip();
+				$('[data-toggle="popover"]').popover();
+			});
+			
+			
+		//定时30s自动刷新	
+		/* 	setInterval(function () {
+				$("#table").bootstrapTable('refresh');
+            }, 1000 * 30); */
+			
+		});
+		function actionFormatter(value, row, index) {
+			if(value=='0')
+				{
+				return [	/* <a class='btn btn-danger' href='javascript:void(0)' onclick=addTab('维护','Map/CsxMap.html') data-toggle='tooltip1' title='未维护'><i class='glyphicon glyphicon-ok'></i></a> */
+					'<a class="btn btn-danger"  href="maintain/listMaintainPage?siteid='+row.siteId+'"   data-toggle="tooltip1" title="未维护"><i class="glyphicon glyphicon-ok"></i></a>&nbsp;<a style="text-decoration:none;"  class="btn btn-success" title="站点定位" href="https://uri.amap.com/marker?position='+row.jd+','+row.wd+'&name='+row.siteAddress+'"><i class="glyphicon glyphicon-map-marker"></i></a>',
+					]
+					.join('');
+				}else if(value=='1'){
+					return [
+						'<a class="btn btn-success"  href="maintain/listMaintainPage?siteid='+row.siteId+'"  data-toggle="tooltip1" title="已维护"><i class="glyphicon glyphicon-ok"></i></a>&nbsp;<a style="text-decoration:none;"  class="btn btn-success" title="站点定位" href="https://uri.amap.com/marker?position='+row.jd+','+row.wd+'&name='+row.siteAddress+'"><i class="glyphicon glyphicon-map-marker"></i></a>',
+						]
+						.join('');	
+				}else if(value=='2'){
+					return [
+						'<a class="btn btn-warning"  href="maintain/listMaintainPage?siteid='+row.siteId+'" data-toggle="tooltip1" title="未解决"><i class="glyphicon glyphicon-ok"></i></a>&nbsp;<a style="text-decoration:none;"  class="btn btn-success" title="站点定位" href="https://uri.amap.com/marker?position='+row.jd+','+row.wd+'&name='+row.siteAddress+'"><i class="glyphicon glyphicon-map-marker"></i></a>',
+						]
+						.join('');	
+				}else{	
+					return [
+						'<a class="btn btn-success"   href="maintain/listMaintainPage?siteid='+row.siteId+'" title="已维护"><i class="glyphicon glyphicon-ok"></i></a>&nbsp;<a style="text-decoration:none;"  class="btn btn-success" title="站点定位" href="https://uri.amap.com/marker?position='+row.jd+','+row.wd+'&name='+row.siteAddress+'"><i class="glyphicon glyphicon-map-marker"></i></a>',
+						]
+						.join('');
+					
+				}
+		
+		}
+		/* 日期格式 */
+		function changeDateFormat(cellval) {
+            if (cellval != null) {
+                var d = new Date(cellval);
+                /*  var times=d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds(); */
+                var times=d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+                return times;
+            } else {
+                return "";
+            }
+        }
+		
+		function dayDiff(mainDate)
+		{
+			if(mainDate!=null)
+				{
+				let date1 = new Date(mainDate);
+			    let date2 = new Date();
+			    date1 = new Date(date1.getFullYear(), date1.getMonth(), date1.getDate());
+			    date2 = new Date(date2.getFullYear(), date2.getMonth(), date2.getDate());
+			    const diff = date2.getTime() - date1.getTime();
+			    const diffDate = diff / (24 * 60 * 60 * 1000);
+				return diffDate;
+				}else {
+	                return "";
+	            }
+			
+		}
+		function detailFormatter(index, row) {
+			var html = [];
+			$.each(row, function(key, value) {
+				html.push('<p><b>' + key + ':</b> ' + value + '</p>');
+			});
+			return html.join('');
+		}
+		
+		/*判断终端是手机还是电脑--用于判断文件是否导出(电脑需要导出)*/
+		function phoneOrPc(){
+		var sUserAgent = navigator.userAgent.toLowerCase();
+		var bIsIpad = sUserAgent.match(/ipad/i) == "ipad";
+		var bIsIphoneOs = sUserAgent.match(/iphone os/i) == "iphone os";
+		var bIsMidp = sUserAgent.match(/midp/i) == "midp";
+		var bIsUc7 = sUserAgent.match(/rv:1.2.3.4/i) == "rv:1.2.3.4";
+		var bIsUc = sUserAgent.match(/ucweb/i) == "ucweb";
+		var bIsAndroid = sUserAgent.match(/android/i) == "android";
+		var bIsCE = sUserAgent.match(/windows ce/i) == "windows ce";
+		var bIsWM = sUserAgent.match(/windows mobile/i) == "windows mobile";
+		if (bIsIpad || bIsIphoneOs || bIsMidp || bIsUc7 || bIsUc || bIsAndroid || bIsCE || bIsWM) {
+		return false;
+		} else {
+		return true;
+		}
+		}
+		
+		
+		
+		// 新增
+		function createAction() {
+			//下拉数据加载 
+			  $.ajax({ 
+			   type : 'get', 
+			   url : "/data/siteType.json", 
+			   dataType : 'json', 
+			   success : function(datas) {//返回list数据并循环获取 
+			    var select = $("#siteTypeName"); 
+			    for (var i = 0; i < datas.length; i++) { 
+			     select.append("<option value='"+datas[i].id+"'>"+ datas[i].text + "</option>"); 
+			    } 
+			    $('.selectpicker').selectpicker('val', ''); 
+			    $('.selectpicker').selectpicker('refresh'); 
+			   } 
+			  });
+			  $(".selectpicker").selectpicker({
+					noneSelectedText : '请选择'//默认显示内容
+				}); 
+			
+			$("#addSiteModal").modal();
+			
+		}
+		// 编辑
+		function updateAction() {
+			var rows = $table.bootstrapTable('getSelections');
+			if (rows.length == 0) {
+				$.confirm({
+					title : false,
+					content : '请至少选择一条记录！',
+					autoClose : 'cancel|3000',
+					backgroundDismiss : true,
+					buttons : {
+						cancel : {
+							text : '取消',
+							btnClass : 'waves-effect waves-button'
+						}
+					}
+				});
+			}else if(rows.length >1){
+				
+				$.confirm({
+					title : false,
+					content : '最多选择一条记录！',
+					autoClose : 'cancel|3000',
+					backgroundDismiss : true,
+					buttons : {
+						cancel : {
+							text : '取消',
+							btnClass : 'waves-effect waves-button'
+						}
+					}
+				});
+				
+			}else{
+				$("#updsiteId").val(rows[0].siteId);
+				$("#updsiteName").val(rows[0].siteName);
+				$("#updsiteAddress").val(rows[0].siteAddress);
+				$("#updjd").val(rows[0].jd);
+				$("#updwd").val(rows[0].wd);
+				$("#updsiteTypeName").val(rows[0].siteTypeName);
+				$("#updriversName").val(rows[0].riversName);
+				$("#updequipment").val(rows[0].equipment);
+				$("#updremark").val(rows[0].remark);
+				
+				//下拉数据加载 
+				  $.ajax({ 
+				   type : 'get', 
+				   url : "/data/siteType.json", 
+				   dataType : 'json', 
+				   success : function(datas) {//返回list数据并循环获取 
+				    var select = $("#updsiteTypeName"); 
+				    for (var i = 0; i < datas.length; i++) { 
+				     select.append("<option value='"+datas[i].id+"'>"+ datas[i].text + "</option>"); 
+				    } 
+				    $('.selectpicker').selectpicker('val', ''); 
+				    $('.selectpicker').selectpicker('refresh'); 
+				   } 
+				  });
+				  $("#updsiteTypeName").selectpicker({
+						noneSelectedText : rows[0].siteTypeName//默认显示内容
+					}); 
+				
+				$("#updSiteModal").modal();
+				
+				
+			}
+		}
+		// 删除
+		function deleteAction() {
+			var rows = $table.bootstrapTable('getSelections');
+			if (rows.length == 0) {
+				$.confirm({
+					title : false,
+					content : '请至少选择一条记录！',
+					autoClose : 'cancel|3000',
+					backgroundDismiss : true,
+					buttons : {
+						cancel : {
+							text : '取消',
+							btnClass : 'waves-effect waves-button'
+						}
+					}
+				});
+			} else {
+				$.confirm({
+					type : 'red',
+					animationSpeed : 300,
+					title : false,
+					content : '确认删除该部门吗？',
+					buttons : {
+						confirm : {
+							text : '确认',
+							btnClass : 'waves-effect waves-button',
+							action : function() {
+
+								for (var i = rows.length - 1; i >= 0; i--) {
+									var site = {};
+									site.siteId = rows[i].siteId;
+									$.ajax({
+										type : "POST",
+										url : "/site/deleteSite",
+										async : true,
+										contentType : "application/json",
+										data : JSON.stringify(site),
+										success : function(result) {
+											console.log(result);
+											if (result["msg"] == "删除成功") {
+												$("#table").bootstrapTable('refresh');
+											} else {
+												toastr.error('删除失败');
+											}
+										}
+									});
+								}
+							}
+						},
+						cancel : {
+							text : '取消',
+							btnClass : 'waves-effect waves-button'
+						}
+					}
+				});
+			}
+		}
+		//关闭模态框
+		$("#closeModal").click(function () {
+            $("#addSiteModal").modal("hide");
+            //关闭模态框后清空填写的数据
+            document.getElementById("addFormSite").reset();
+            $(".selectpicker").empty();
+   			 $('.selectpicker').selectpicker('val', ''); 
+		    $('.selectpicker').selectpicker('refresh'); 
+    });
+		
+		//关闭修改模态框
+		$("#updcloseModal").click(function () {
+            $("#updSiteModal").modal("hide");
+            //关闭模态框后清空填写的数据
+            document.getElementById("updFormSite").reset();
+            $(".selectpicker").empty();
+   			 $('.selectpicker').selectpicker('val', ''); 
+		    $('.selectpicker').selectpicker('refresh'); 
+    });
+		//录入
+		$("#savaSite").click(function () {
+			var site = {};
+			site.siteName =$("#addsiteName").val();
+			site.siteAddress =$("#addsiteAddress").val();
+			site.jd =$("#addjd").val();
+			site.wd =$("#addwd").val();
+			site.siteTypeName =$("#siteTypeName").val();
+			site.riversName = $("#addriversName").val();
+			site.equipment =$("#addequipment").val();
+			site.remark =$("#addremark").val();
+			if(null==site.siteTypeName)
+				{
+				$("#siteTypeName").focus();
+				return false;
+				}
+			if(site.jd=="")
+			{
+			$("#addjd").focus();
+			return false;
+			}
+			if(site.wd=="")
+			{
+			$("#addwd").focus();
+			return false;
+			}
+	    	  $.ajax({
+	    	        //接口地址
+	    	        url: '/site/addSite',
+	    	        type: 'POST',
+	    	        data : JSON.stringify(site),
+	    	        contentType : "application/json",
+	    	        success: function (result) {
+	    	        	toastr.success(result);
+	    	        	$("#table").bootstrapTable('refresh');
+	    	        	$("#addSiteModal").modal("hide");
+		                //关闭模态框后清空填写的数据
+		                document.getElementById("addFormSite").reset();
+		                $(".selectpicker").empty();
+	    	    		 $('.selectpicker').selectpicker('val', ''); 
+		    		    $('.selectpicker').selectpicker('refresh'); 
+	    	            //成功的回调
+
+	    	        },
+	    	        error: function (returndata) {
+		    	           //请求异常的回调
+		    	           // modals.warn("网络访问失败，请稍后重试!");
+		    	           
+		    	          toastr.error('网络访问失败，请稍后重试!');
+		    	           $("#addSiteModal").modal("hide");
+			                //关闭模态框后清空填写的数据
+			                document.getElementById("addFormSite").reset();
+			                $(".selectpicker").empty();
+		    	    		 $('.selectpicker').selectpicker('val', ''); 
+			    		    $('.selectpicker').selectpicker('refresh'); 
+		    	        }
+	    	    }); 
+		});
+		
+		
+		
+		
+		//修改
+		$("#updSite").click(function () {
+			var site = {};
+			site.siteId =$("#updsiteId").val();
+			site.siteName =$("#updsiteName").val();
+			site.siteAddress =$("#updsiteAddress").val();
+			site.jd =$("#updjd").val();
+			site.wd =$("#updwd").val();
+			site.siteTypeName =$("#updsiteTypeName").val();
+			site.riversName = $("#updriversName").val();
+			site.equipment =$("#updequipment").val();
+			site.remark =$("#updremark").val();
+			if(null==site.siteTypeName)
+			{
+			$("#updsiteTypeName").focus();
+			return false;
+			}
+			if(site.jd=="")
+			{
+			$("#updjd").focus();
+			return false;
+			}
+			if(site.wd=="")
+			{
+			$("#updwd").focus();
+			return false;
+			}
+	    	 $.ajax({
+	    	        //接口地址
+	    	        url: '/site/updSite',
+	    	        type: 'POST',
+	    	        data : JSON.stringify(site),
+	    	        contentType : "application/json",
+	    	        success: function (result) {
+	    	        	toastr.success(result);
+	    	        	$("#table").bootstrapTable('refresh');
+	    	        	$("#updSiteModal").modal("hide");
+		                //关闭模态框后清空填写的数据
+		                document.getElementById("updFormSite").reset();
+		                $(".selectpicker").empty();
+	    	    		 $('.selectpicker').selectpicker('val', ''); 
+		    		    $('.selectpicker').selectpicker('refresh'); 
+	    	            //成功的回调
+
+	    	        },
+	    	        error: function (returndata) {
+		    	           //请求异常的回调
+		    	           // modals.warn("网络访问失败，请稍后重试!");
+		    	        toastr.error('网络访问失败，请稍后重试!');
+		    	           $("#updSiteModal").modal("hide");
+			                //关闭模态框后清空填写的数据
+			                document.getElementById("updFormSite").reset();
+			                $(".selectpicker").empty();
+		    	    		 $('.selectpicker').selectpicker('val', ''); 
+			    		    $('.selectpicker').selectpicker('refresh'); 
+		    	        }
+	    	    });
+		});
+		
+		
+		 $('#addSiteModal').on('hide.bs.modal', function () {
+			 document.getElementById("addFormSite").reset();
+	            $(".selectpicker").empty();
+	   			 $('.selectpicker').selectpicker('val', ''); 
+			    $('.selectpicker').selectpicker('refresh'); 
+	   });
+		 $('#updSiteModal').on('hide.bs.modal', function () {
+			//关闭模态框后清空填写的数据
+	            document.getElementById("updFormSite").reset();
+	            $(".selectpicker").empty();
+	   			 $('.selectpicker').selectpicker('val', ''); 
+			    $('.selectpicker').selectpicker('refresh'); 
+	   });
+		
+	</script>
+	
+</body>
+</html>

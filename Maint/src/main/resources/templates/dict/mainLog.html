@@ -1,0 +1,227 @@
+﻿<!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>配件统计列表</title>
+<base href="/static">
+<link href="plugins/bootstrap-3.3.0/css/bootstrap.min.css" rel="stylesheet" />
+<link href="plugins/material-design-iconic-font-2.2.0/css/material-design-iconic-font.min.css" rel="stylesheet" />
+<link href="plugins/bootstrap-3.3.0/css/bootstrap-select.min.css" rel="stylesheet" />
+<link href="plugins/bootstrap-table-1.11.0/bootstrap-table.min.css" rel="stylesheet" />
+<link href="plugins/bootstrap-3.3.0/css/bootstrapValidator.css" rel="stylesheet" />
+<link href="plugins/waves-0.7.5/waves.min.css" rel="stylesheet" />
+<link href="plugins/jquery-confirm/jquery-confirm.min.css" rel="stylesheet" />
+<link href="css/common.css" rel="stylesheet" />
+<link href="css/daterangepicker-bs3.css" rel="stylesheet" />
+<link href="css/table.css" rel="stylesheet" />
+</head>
+<body>
+	
+	<div id="main">
+	<div style="margin-top: 10px" class="row">
+		<div class="col-md-3 col-xs-12">
+			<input type="text" name="time" readonly id="time" class="form-control" value="请选择日期范围">
+			<input type="hidden" id = "startTime" name="startTime" class="form-control" />
+			<input type="hidden" id = "endTime" name="endTime" class="form-control" />
+		</div>
+		</div>
+	<table id="table" class="table-hover"></table>
+	
+	</div>
+	
+	
+	<section id="content">
+		<div class="content_tab">
+			<ul id="tabs" class="tabs">
+			</ul>
+		</div>
+		<div class="content_main">
+			<div id="iframe_home" class="iframe cur">
+			</div>
+		</div>
+	</section>
+	<script src="plugins/jquery.1.12.4.min.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/bootstrap.min.js"></script>
+	<script src="plugins/bootstrap-table-1.11.0/bootstrap-table.min.js"></script>
+	<script src="plugins/bootstrap-table-1.11.0/locale/bootstrap-table-zh-CN.min.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/bootstrap-select.min.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/defaults-zh_CN.min.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/bootstrapValidator.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/zh_CN.js"></script>
+	<script src="plugins/waves-0.7.5/waves.min.js"></script>
+	<script src="plugins/jquery-confirm/jquery-confirm.min.js"></script>
+	<script src="js/common.js"></script>
+	<script src="js/moment.js"></script>
+	<script src="js/daterangepicker.js"></script>
+	<script>
+	
+		var $table = $('#table');
+		$(function() {
+			$(document).on('focus', 'input[type="text"]', function() {
+				$(this).parent().find('label').addClass('active');
+			}).on('blur', 'input[type="text"]', function() {
+				if ($(this).val() == '') {
+					$(this).parent().find('label').removeClass('active');
+				}
+			});
+			
+			
+			// bootstrap table初始化
+			$table.bootstrapTable({
+				url : '/maintain/listMaintainLog',
+				height : getHeight(),
+				striped : true,
+				search : true,
+				searchOnEnterKey : true,
+				showRefresh : true,
+				showToggle : false,
+				showColumns : false,
+				minimumCountColumns : 2,
+				showPaginationSwitch : false,
+				clickToSelect : true,
+				detailView : false,
+				toolbar : '#toolbar',
+				detailFormatter : 'detailFormatter',
+				pagination : true,
+				paginationLoop : false,
+				classes : 'table table-hover table-no-bordered',
+				smartDisplay : false,
+				idField : 'id',
+				sortName : 'id',
+				sortOrder : 'desc',
+				escape : true,
+				searchOnEnterKey : true,
+				idField : 'systemId',
+				maintainSelected : true,
+				columns : [ {
+					field : 'id',
+					title : '编号',
+					 visible: false
+				},{
+					field : 'sitemainName',
+					title : '站点名称',
+					sortable : true,
+					halign : 'center'
+				},{
+					field : 'resolvent',
+					title : '处理情况',
+					sortable : true,
+					halign : 'center'
+				} ,{
+					field : 'maintainManName',
+					title : '维护人员',
+					sortable : true,
+					halign : 'center'
+				} ,{
+					field : 'maintainDate',
+					title : '维护日期',
+					sortable : true,
+					halign : 'center',
+					formatter: function (value, row, index) {
+	                    return DateFormat(value)
+	                }
+				},{
+					field : 'remark',
+					title : '备注',
+					sortable : true,
+					halign : 'center'
+					
+				}
+				],
+				formatNoMatches: function () {  
+				    return '今日的数据请于20:00之后再来查询';  
+				  },
+			}).on('all.bs.table', function(e, name, args) {
+				$('[data-toggle="tooltip"]').tooltip();
+				$('[data-toggle="popover"]').popover();
+			});
+			
+			//区间时间插件
+			$("input[name='time']").daterangepicker(
+			{
+			// autoApply: true,
+			autoUpdateInput: false,
+			// alwaysShowCalendars: true,
+			ranges: {
+			'今天': [moment(),moment()],
+			'昨天': [moment().subtract(1, 'days'),moment().subtract(1, 'days')],
+			'近7天': [moment().subtract(7, 'days'), moment()],
+			'这个月': [moment().startOf('month'), moment().endOf('month')],
+			'上个月': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+			},
+			locale: {
+			format: "YYYY/MM/DD HH:MM:SS",
+			separator: " - ",
+			applyLabel: "确认",
+			cancelLabel: "清空",
+			fromLabel: "开始时间",
+			toLabel: "结束时间",
+			customRangeLabel: "自定义",
+			daysOfWeek: ["日","一","二","三","四","五","六"],
+			monthNames: ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"]
+			}
+			}
+			).on('cancel.daterangepicker', function(ev, picker) {
+			$("#time").val("请选择日期范围");
+			$("#startTime").val("");
+			$("#endTime").val("");
+			}).on('apply.daterangepicker', function(ev, picker) {
+			$("#startTime").val(picker.startDate.format('YYYY-MM-DD'));
+			$("#endTime").val(picker.endDate.format('YYYY-MM-DD'));
+			$("#time").val(picker.startDate.format('YYYY-MM-DD')+" 至 "+picker.endDate.format('YYYY-MM-DD'));
+			
+			$.ajax({
+				type: "get",
+				url: "/maintain/findDayByDate",
+				data: {
+					startDate : $("#startTime").val(),
+					endDate:$("#endTime").val()
+				},
+				dataType:"json",
+				success : function(json) {
+					$("#table").bootstrapTable('load', json);
+				}
+			});
+
+			
+			
+			
+			});
+			
+			
+			
+			
+		});
+		function detailFormatter(index, row) {
+			var html = [];
+			$.each(row, function(key, value) {
+				html.push('<p><b>' + key + ':</b> ' + value + '</p>');
+			});
+			return html.join('');
+		}
+		
+		
+		function DateFormat(cellval) {
+			var dateVal = cellval + "";
+	        if (cellval != null) {
+	            var date = new Date(parseInt(dateVal.replace("/Date(", "").replace(")/", ""), 10));
+	            var month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
+	            var currentDate = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+	            
+	            var hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+	            var minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+	            var seconds = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
+	            
+	            return date.getFullYear() + "-" + month + "-" + currentDate;
+	        }
+        }
+		
+		
+		
+	
+	</script>
+	
+</body>
+</html>

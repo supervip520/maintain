@@ -1,0 +1,244 @@
+<!DOCTYPE HTML>
+<html lang="zh-cn" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>首页</title>
+	<base href="/static">
+	<link href="plugins/fullPage/jquery.fullPage.css" rel="stylesheet"/>
+	<link href="plugins/bootstrap-3.3.0/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="css/bootstrap-treeview.css" rel="stylesheet" />
+	<link href="zTree_v3/css/zTreeStyle/zTreeStyle.css" rel="stylesheet" type="text/css" />
+	<link href="plugins/material-design-iconic-font-2.2.0/css/material-design-iconic-font.min.css" rel="stylesheet"/>
+	<link href="plugins/waves-0.7.5/waves.min.css" rel="stylesheet"/>
+	<link href="plugins/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet"/>
+	<link href="css/grid/openplat.css" rel="stylesheet"/>
+	<link href="css/pixel-admin.min.css" rel="stylesheet"/>
+	<link href="css/admin.css" rel="stylesheet"/>
+	<style>
+	/** skins **/
+	#zheng-upms-server #header {background: #29A176;}
+	#zheng-upms-server .content_tab{background: #29A176;}
+	#zheng-upms-server .s-profile>a{background: url(images/zheng-upms.png) left top no-repeat;}
+	
+	#zheng-cms-admin #header {background: #455EC5;}
+	#zheng-cms-admin .content_tab{background: #455EC5;}
+	#zheng-cms-admin .s-profile>a{background: url(images/zheng-cms.png) left top no-repeat;}
+	
+	#zheng-pay-admin #header {background: #F06292;}
+	#zheng-pay-admin .content_tab{background: #F06292;}
+	#zheng-pay-admin .s-profile>a{background: url(images/zheng-pay.png) left top no-repeat;}
+	
+	#zheng-ucenter-home #header {background: #6539B4;}
+	#zheng-ucenter-home .content_tab{background: #6539B4;}
+	#zheng-ucenter-home .s-profile>a{background: url(images/zheng-ucenter.png) left top no-repeat;}
+	
+	#zheng-oss-web #header {background: #0B8DE5;}
+	#zheng-oss-web .content_tab{background: #0B8DE5;}
+	#zheng-oss-web .s-profile>a{background: url(images/zheng-oss.png) left top no-repeat;}
+	
+	#test #header {background: test;}
+	#test .content_tab{background: test;}
+	#test .s-profile>a{background: url(test) left top no-repeat;}
+	</style>
+</head>
+<body>
+<header id="header">
+	<ul id="menu">
+		<li id="guide" class="line-trigger">
+			<div class="line-wrap">
+				<div class="line top"></div>
+				<div class="line center"></div>
+				<div class="line bottom"></div>
+			</div>
+		</li>
+		<li id="logo" class="hidden-xs">
+			<a href="/index">
+			<strong><span id="system_title"></span></strong>
+			</a>
+			
+		</li>
+		<li class="pull-right">
+			<ul class="hi-menu">
+
+				<li class="dropdown">
+					<a class="waves-effect waves-light" data-toggle="dropdown" href="javascript:;">
+						<i class="him-icon zmdi zmdi-dropbox"></i>
+					</a>
+					<ul class="dropdown-menu dm-icon pull-right">
+						
+						<li class="skin-switch">
+							请选择背景
+						</li>
+						<li class="divider"></li>
+						<li>
+							<a class="waves-effect switch-systems"  systemid="1" systemname="zheng-upms-server" ><i class="glyphicon glyphicon-chevron-right"></i>　　绿色清新</a>
+						</li>
+						
+						<li>
+							<a class="waves-effect switch-systems"  systemid="1" systemname="zheng-cms-admin" systemtitle="管理系统"><i class="glyphicon glyphicon-chevron-right"></i>　　蓝色商务</a>
+						</li>
+						
+						<li>
+							<a class="waves-effect switch-systems"  systemid="1" systemname="zheng-ucenter-home" systemtitle=" 源管理系统"><i class="glyphicon glyphicon-chevron-right"></i>　　紫色骚气</a>
+						</li>
+						
+						<li>
+							<a class="waves-effect switch-systems"  systemid="1" systemname="zheng-oss-web" systemtitle=" 管理系统"><i class="glyphicon glyphicon-chevron-right"></i>　　浅蓝活泼</a>
+						</li>
+					</ul>
+				</li>
+				<li class="dropdown">
+					<a class="waves-effect waves-light" data-toggle="dropdown" href="javascript:;">
+						<i class="him-icon zmdi zmdi-more-vert"></i>
+					</a>
+					<ul class="dropdown-menu dm-icon pull-right">
+						<li class="hidden-xs">
+							<a class="waves-effect" data-ma-action="fullscreen" href="javascript:fullPage();"><i class="zmdi zmdi-fullscreen"></i> 全屏模式</a>
+						</li>
+						<li>
+							<a class="waves-effect" href="javascript:logout()"><i class="zmdi zmdi-run"></i> 退出登录</a>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</li>
+	</ul>
+</header>
+<section id="main">
+	<!-- 左侧导航区 -->
+	<aside id="sidebar">
+		<!-- 个人资料区 -->
+		<div class="s-profile">
+			<a class="waves-effect waves-light" href="javascript:;">
+				<div class="sp-pic">
+					<img src="images/avatar.jpg"/>
+				</div>
+				<div class="sp-info">
+				 	您好，<span th:text="${session.user!=null?session.user.fullName:''}"></span>! 
+					<i class="zmdi zmdi-caret-down"></i>
+				</div>
+			</a>
+			<ul class="main-menu">
+				<li>
+		<a href="javascript:showModal('修改密码', '/user/updatePasswdPage');"  class="waves-effect"><i class="glyphicon glyphicon-cog"></i>修改密码</a>
+				</li>
+				<li>
+		<a href="https://support.qq.com/product/152497"  class="waves-effect"><i class="glyphicon glyphicon-edit"></i>意见反馈</a>
+					
+				</li>
+				<li>
+		<a class="waves-effect" href="javascript:logout()"><i class="zmdi zmdi-run"></i> 退出登录</a>
+				</li>
+			</ul>
+		</div>
+		<!-- /个人资料区 -->
+		<!-- 菜单区 -->
+		<div id="tree"></div>
+		<!-- /菜单区 -->
+	</aside>
+	<!-- /左侧导航区 -->
+	<section id="content">
+		<div class="content_tab">
+			<div class="tab_left">
+				<a class="waves-effect waves-light" href="javascript:;"><i class="zmdi zmdi-chevron-left"></i></a>
+			</div>
+			<div class="tab_right">
+				<a class="waves-effect waves-light" href="javascript:;"><i class="zmdi zmdi-chevron-right"></i></a>
+			</div>
+			<ul id="tabs" class="tabs">
+				<li id="tab_home" data-index="home" data-closeable="false" class="cur">
+					<a class="waves-effect waves-light">首页</a>
+				</li>
+			</ul>
+		</div>
+		<div class="content_main">
+			<div id="iframe_home" class="iframe cur">
+				<iframe src="/maintain/listMaintainLogPage" width="100%" height="100%"></iframe>
+			</div>
+		</div>
+	</section>
+</section>
+<footer id="footer"></footer>
+
+<script src="plugins/jquery.1.12.4.min.js"></script>
+<script src="plugins/bootstrap-3.3.0/js/bootstrap.min.js"></script>
+<script src="js/bootstrap-treeview.js"></script>
+<script src="plugins/waves-0.7.5/waves.min.js"></script>
+<script src="plugins/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
+<script src="plugins/BootstrapMenu.min.js"></script>
+<script src="plugins/device.min.js"></script>
+<script src="plugins/fullPage/jquery.fullPage.min.js"></script>
+<script src="plugins/fullPage/jquery.jdirk.min.js"></script>
+<script src="plugins/jquery.cookie.js"></script>
+<script src="zTree_v3/js/jquery.ztree.all.min.js" type="text/javascript"></script>
+<script src="js/pixel-admin.min.js"></script>
+<script src="js/grid/spagination.js"></script>
+<script src="js/grid/sgrid.js"></script>
+<script src="js/grid/model.js"></script>
+<script src="js/grid/utils.js"></script>
+<script src="js/util/Util.js"></script>
+<script src="js/util/form.js"></script>
+<script src="js/admin.js"></script>
+<script>
+     document.addEventListener("plusready", function() { 
+        // 注册返回按键事件 
+        plus.key.addEventListener('backbutton', function() { 
+        // 事件处理 
+            plus.nativeUI.confirm("退出程序？", function(event) { 
+                if (event.index==0) { 
+                    plus.runtime.quit(); 
+                }
+            }, null, ["取消", "确定"]); 
+        }, false); 
+    }); 
+     
+     
+     
+
+
+     var url = "/menu";
+     $.get(url, {}, function (data) {
+         init(data);
+     }, 'json')
+     //页面初始化时，发送异步请求，获取tree数据
+
+
+     //加载tree数据
+
+     var init = function (data) {
+         return $("#tree").treeview({
+             data: data,
+             color: "black",
+             levels: 2,
+             onNodeSelected: function (event, node) {
+            	 if(node.nodes!=null){
+            		 var select_node = $('#tree').treeview('getSelected');
+            	        if(select_node[0].state.expanded){
+            	            $('#tree').treeview('collapseNode',select_node);
+            	            select_node[0].state.selected=false;
+            	        }
+            	        else{
+            	            $('#tree').treeview('expandNode',select_node);
+            	            select_node[0].state.selected=false;
+            	        }
+            	 }
+            	 if(node.href!='')
+            		 {
+            		 Tab.addTab(node.text, node.href);
+            		 }
+            	 
+             },
+         });
+     }
+     
+     function logout() {
+ 		$.Cfm("确定注销登录?", function() {
+ 						window.location.href = "/logout";
+ 		});
+ 	}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,518 @@
+﻿<!DOCTYPE HTML>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>角色列表</title>
+<base href="/static">
+<link href="plugins/bootstrap-3.3.0/css/bootstrap.min.css" rel="stylesheet" />
+<link href="plugins/material-design-iconic-font-2.2.0/css/material-design-iconic-font.min.css" rel="stylesheet" />
+<link href="plugins/bootstrap-3.3.0/css/bootstrap-select.min.css" rel="stylesheet" />
+<link href="plugins/bootstrap-table-1.11.0/bootstrap-table.min.css" rel="stylesheet" />
+<link href="plugins/bootstrap-3.3.0/css/bootstrapValidator.css" rel="stylesheet" />
+<link href="plugins/waves-0.7.5/waves.min.css" rel="stylesheet" />
+<link href="plugins/jquery-confirm/jquery-confirm.min.css" rel="stylesheet" />
+<link href="css/common.css" rel="stylesheet" />
+<link href="css/table.css" rel="stylesheet" />
+<link href="css/toastr.css" rel="stylesheet" />
+</head>
+<body>
+	
+	<div id="main">
+		<!-- <div id="toolbar">
+			<a class="btn btn-primary" href="javascript:;"
+				onclick="createAction()"><i class="zmdi zmdi-plus"></i> 新增角色信息</a> <a
+				class="btn btn-primary" href="javascript:;"
+				onclick="updateAction()"><i class="zmdi zmdi-edit"></i> 编辑角色信息</a> <a
+				class="btn btn-primary" href="javascript:;"
+				onclick="deleteAction()"><i class="zmdi zmdi-close"></i> 删除角色信息</a>
+		</div> -->
+		<table id="table" class="table-hover"></table>
+	</div>
+	<!-- 新增 -->
+	<div class="modal fade bs-example-modal-md" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="addUserModal" data-backdrop="static">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">录入角色</h4>
+            </div>
+            <div class="modal-body">
+                <form  id="addFormUser" class="form-horizontal">
+                    <div class="form-group" style="text-align: center;">
+                    <div class="col-md-12 col-xs-12">
+                    		<strong>角色编号:</strong><br>
+                         <input id="adduser_account" name="user_account" type="text"  class="form-control">
+                     </div>  
+                    </div>
+                    <div class="form-group" style="text-align: center;">
+                     <div class="col-md-12 col-xs-12">
+                     <strong>角色名称:</strong><br>
+                    <input id="adduser_password"  name="user_password" value="" type="password"
+					class="form-control">
+                     </div> 
+                    </div>
+                    
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="savaUser">保存</button>
+                 <button type="button" class="btn btn-default" id="closeModal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+	
+	<!-- 修改 -->
+	<div class="modal fade bs-example-modal-md" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="updUserModal" data-backdrop="static">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" >编辑角色</h4>
+            </div>
+            <div class="modal-body">
+                <form  id="updFormUser" class="form-horizontal">
+                   <div class="form-group" style="text-align: center;">
+                    <div class="col-md-12 col-xs-12">
+                    		<strong>角色编号:</strong><br>
+                    		<input id="updid" name="id" type="hidden"/>
+                         <input id="upduser_account" name="user_account" type="text"  class="form-control">
+                     </div>  
+                    </div>
+                    <div class="form-group" style="text-align: center;">
+                     <div class="col-md-12 col-xs-12">
+                     <strong>角色名称:</strong><br>
+                    <input id="upduser_password"  name="user_password" value="" type="password"
+					class="form-control">
+                     </div> 
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="updUser">保存</button>
+                 <button type="button" class="btn btn-default" id="updcloseModal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+	
+	
+	
+	<section id="content">
+		<div class="content_tab">
+			<ul id="tabs" class="tabs">
+			</ul>
+		</div>
+		<div class="content_main">
+			<div id="iframe_home" class="iframe cur">
+			</div>
+		</div>
+	</section>
+	<script src="plugins/jquery.1.12.4.min.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/bootstrap.min.js"></script>
+	<script src="plugins/bootstrap-table-1.11.0/bootstrap-table.min.js"></script>
+	<script src="plugins/bootstrap-table-1.11.0/locale/bootstrap-table-zh-CN.min.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/bootstrap-select.min.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/defaults-zh_CN.min.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/bootstrapValidator.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/zh_CN.js"></script>
+	<script src="plugins/waves-0.7.5/waves.min.js"></script>
+	<script src="plugins/jquery-confirm/jquery-confirm.min.js"></script>
+	<script src="js/toastr.min.js"></script>
+	<script src="js/common.js"></script>
+	<script>
+	toastr.options.positionClass = 'toast-top-center';
+    var addform = $('#addFormUser');
+    var updform = $('#updFormUser');
+    $(document).ready(function () {
+
+    	addform.bootstrapValidator({
+            message: '输入值不合法',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+            	user_account: {
+                    validators: {
+                        notEmpty: {
+                            message: '用户名称不能为空'
+                        },
+                        stringLength: {
+                        	min: 2,
+                            max: 10,
+                            message: '请输入2到10个字符'
+                        }
+                    }
+                },
+                user_password: {
+                    validators: {
+                        notEmpty: {
+                            message: '用户密码不能为空'
+                        },
+                        stringLength: {
+                        	min: 5,
+                            max: 20,
+                            message: '请输入5到20个字符'
+                        }
+                    }
+                },
+                fullName: {
+                    validators: {
+                        notEmpty: {
+                            message: '用户姓名不能为空'
+                        }
+                    }
+                }
+            }
+        });
+    	updform.bootstrapValidator({
+            message: '输入值不合法',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+            	user_account: {
+                    validators: {
+                        notEmpty: {
+                            message: '用户名称不能为空'
+                        },
+                        stringLength: {
+                            max: 10,
+                            message: '请输入1到10个字符'
+                        }
+                    }
+                },
+                user_password: {
+                    validators: {
+                        notEmpty: {
+                            message: '用户密码不能为空'
+                        },
+                        stringLength: {
+                        	min: 5,
+                            max: 20,
+                            message: '请输入5到20个字符'
+                        }
+                    }
+                },
+                fullName: {
+                    validators: {
+                        notEmpty: {
+                            message: '用户姓名不能为空'
+                        }
+                    }
+                }
+            }
+        });
+    });
+	
+	
+	
+	
+	
+	
+		var $table = $('#table');
+		$(function() {
+			$(document).on('focus', 'input[type="text"]', function() {
+				$(this).parent().find('label').addClass('active');
+			}).on('blur', 'input[type="text"]', function() {
+				if ($(this).val() == '') {
+					$(this).parent().find('label').removeClass('active');
+				}
+			});
+			
+			
+			// bootstrap table初始化
+			$table.bootstrapTable({
+				url : '/role/listRole',
+				height : getHeight(),
+				striped : true,
+				search : true,
+				searchOnEnterKey : true,
+				showRefresh : true,
+				showToggle : false,
+				showColumns : false,
+				minimumCountColumns : 2,
+				showPaginationSwitch : false,
+				clickToSelect : true,
+				detailView : false,
+				detailFormatter : 'detailFormatter',
+				pagination : true,
+				paginationLoop : false,
+				classes : 'table table-hover table-no-bordered',
+				smartDisplay : false,
+				idField : 'id',
+				sortName : 'id',
+				sortOrder : 'desc',
+				escape : true,
+				searchOnEnterKey : true,
+				idField : 'systemId',
+				maintainSelected : true,
+				toolbar : '#toolbar',
+				columns : [ {
+					field : 'state',
+					checkbox : true
+				},{
+					field : 'id',
+					title : '编号',
+					 visible: false
+				},{
+					field : 'roleKey',
+					title : '角色编号',
+					halign : 'center',
+					
+				},{
+					field : 'roleDesc',
+					title : '角色名称',
+					halign : 'center'
+				} 
+				,{
+					field : 'null',
+					title : '操作',
+					halign : 'center',
+				}
+				]
+			}).on('all.bs.table', function(e, name, args) {
+				$('[data-toggle="tooltip"]').tooltip();
+				$('[data-toggle="popover"]').popover();
+			});
+			
+		//定时30s自动刷新	
+		/* 	setInterval(function () {
+				$("#table").bootstrapTable('refresh');
+            }, 1000 * 30); */
+			
+		});
+		function detailFormatter(index, row) {
+			var html = [];
+			$.each(row, function(key, value) {
+				html.push('<p><b>' + key + ':</b> ' + value + '</p>');
+			});
+			return html.join('');
+		}
+		// 新增
+		function createAction() {
+			$("#addUserModal").modal();
+			
+		}
+		// 编辑
+		function updateAction() {
+			var rows = $table.bootstrapTable('getSelections');
+			if (rows.length == 0) {
+				$.confirm({
+					title : false,
+					content : '请至少选择一条记录！',
+					autoClose : 'cancel|3000',
+					backgroundDismiss : true,
+					buttons : {
+						cancel : {
+							text : '取消',
+							btnClass : 'waves-effect waves-button'
+						}
+					}
+				});
+			}else if(rows.length >1){
+				
+				$.confirm({
+					title : false,
+					content : '最多选择一条记录！',
+					autoClose : 'cancel|3000',
+					backgroundDismiss : true,
+					buttons : {
+						cancel : {
+							text : '取消',
+							btnClass : 'waves-effect waves-button'
+						}
+					}
+				});
+				
+			}else{
+				$("#updid").val(rows[0].id);
+				$("#upduser_account").val(rows[0].user_account);
+				$("#upduser_password").val(rows[0].user_password);
+				$("#updfullName").val(rows[0].fullName);
+				
+				$("#updUserModal").modal();
+			}
+		}
+		
+		$('#addUserModal').on('hide.bs.modal', function () {
+			 document.getElementById("addFormUser").reset(); 
+		
+	   });
+	   $('#updUserModal').on('hide.bs.modal', function () {
+			 document.getElementById("updFormUser").reset(); 
+		
+	   });
+		
+		
+		/* 日期格式 */
+		function changeDateFormat(cellval) {
+            if (cellval != null) {
+                var d = new Date(cellval);
+                var times=d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                return times;
+            } else {
+                return cellval;
+            }
+        }
+		// 删除
+		function deleteAction() {
+			var rows = $table.bootstrapTable('getSelections');
+			if (rows.length == 0) {
+				$.confirm({
+					title : false,
+					content : '请至少选择一条记录！',
+					autoClose : 'cancel|3000',
+					backgroundDismiss : true,
+					buttons : {
+						cancel : {
+							text : '取消',
+							btnClass : 'waves-effect waves-button'
+						}
+					}
+				});
+			} else {
+				$.confirm({
+					type : 'red',
+					animationSpeed : 300,
+					title : false,
+					content : '确认删除该用户吗？',
+					buttons : {
+						confirm : {
+							text : '确认',
+							btnClass : 'waves-effect waves-button',
+							action : function() {
+								for (var i = rows.length - 1; i >= 0; i--) {
+									var user={};
+									user.id = rows[i].id;
+									$.ajax({
+										type : "POST",
+										url : "/user/deleteUser",
+										async : true,
+										contentType : "application/json",
+										data : JSON.stringify(user),
+										success : function(result) {
+											if (result["msg"] == "删除成功") {
+												$("#table").bootstrapTable('refresh');
+											} else {
+												 toastr.error('删除失败');
+											}
+										}
+									});
+								}
+							}
+						},
+						cancel : {
+							text : '取消',
+							btnClass : 'waves-effect waves-button'
+						}
+					}
+				});
+			}
+		}
+		//关闭模态框
+		$("#closeModal").click(function () {
+            $("#addUserModal").modal("hide");
+            //关闭模态框后清空填写的数据
+            document.getElementById("addFormUser").reset();
+    });
+		
+		//关闭修改模态框
+		$("#updcloseModal").click(function () {
+            $("#updUserModal").modal("hide");
+            //关闭模态框后清空填写的数据
+            document.getElementById("updFormUser").reset();
+    });
+		//录入
+		$("#savaUser").click(function () {
+			var user = {};
+			user.user_account =$("#adduser_account").val();
+			user.user_password =$("#adduser_password").val();
+			user.fullName =$("#addfullName").val();
+	    	 $.ajax({
+	    	        //接口地址
+	    	        url: '/user/addUser',
+	    	        type: 'POST',
+	    	        data : JSON.stringify(user),
+	    	        contentType : "application/json",
+	    	        success: function (result) {
+	    	        	if (result["msg"] == "添加成功"){
+	    	        		 toastr.success('添加成功');
+	    	        		$("#table").bootstrapTable('refresh');
+		    	        	$("#addUserModal").modal("hide");
+		    	        	  document.getElementById("addFormUser").reset();
+						}else{
+							 toastr.error('添加失败');
+							$("#table").bootstrapTable('refresh');
+		    	        	$("#addUserModal").modal("hide");
+		    	        	  document.getElementById("addFormUser").reset();
+							}
+							return false;
+					
+	    	        
+	    	        },
+	    	        error: function (returndata) {
+		    	           //请求异常的回调
+		    	           toastr.error('网络访问失败，请稍后重试!');
+		    	           $("#addUserModal").modal("hide");
+			                //关闭模态框后清空填写的数据
+			                document.getElementById("addFormUser").reset();
+		    	        }
+	    	    });
+		});
+		
+		
+		
+		
+		//修改
+		$("#updUser").click(function () {
+			var user = {};
+			user.id=$("#updid").val();
+			user.user_account =$("#upduser_account").val();
+			user.user_password =$("#upduser_password").val();
+			user.fullName =$("#updfullName").val();
+	    	 $.ajax({
+	    	        //接口地址
+	    	        url: '/user/updateUser',
+	    	        type: 'POST',
+	    	        data : JSON.stringify(user),
+	    	        contentType : "application/json",
+	    	        success: function (result) {
+	    	        	if (result["msg"] == "用户修改成功"){
+	    	        		toastr.success('修改成功');
+	    	        		$("#table").bootstrapTable('refresh');
+		    	        	$("#updUserModal").modal("hide");
+		    	        	 document.getElementById("updFormUser").reset();
+		    	        	
+		    	        		
+						}else{
+							  toastr.error('修改失败');
+							$("#table").bootstrapTable('refresh');
+		    	        	$("#updUserModal").modal("hide");
+		    	        	 document.getElementById("updFormUser").reset();
+							}
+
+	    	        },
+	    	        error: function (returndata) {
+		    	           //请求异常的回调
+		    	           // modals.warn("网络访问失败，请稍后重试!");
+		    	           toastr.error('网络访问失败，请稍后重试!');
+		    	           $("#updUserModal").modal("hide");
+			                //关闭模态框后清空填写的数据
+		    	           document.getElementById("updFormUser").reset();
+		    	        }
+	    	    });
+		});
+		
+		
+		
+	</script>
+	
+</body>
+</html>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.maint.user.mapper.IDbUserMapper">
+	<!-- 查询语句 -->
+	<select id="listUser" resultType="DbUser" >
+			SELECT  *
+			FROM db_user u
+			WHERE u.isdelete=0;
+	</select>
+	<!-- 查询语句；判断是否存在用户 -->
+	<select id="loginByUserNameAndPassword"  resultType="DbUser">
+		SELECT * FROM db_user  WHERE user_account=#{user_account} AND user_password=#{user_password} 
+	</select>
+	<!-- 插入语句 -->
+	<insert id="addUser">
+		INSERT INTO db_user(user_account,user_password,creat_time,fullName,isdelete,status)
+		VALUES(#{user_account},#{user_password},#{creat_time},#{fullName},#{isdelete},#{status});
+	</insert>
+	<!-- 更新语句 -->
+	<update id="updateUser">
+		UPDATE db_user 
+		<set>
+		<if test="user_account != null">user_account=#{user_account},</if>
+		<if test="user_password != null">user_password=#{user_password},</if>
+		<if test="fullName != null">fullName=#{fullName},</if>
+		</set>
+		 WHERE id=#{id};
+	</update>
+	<!-- 删除语句 -->
+	<delete id="deleteUser">
+		UPDATE  db_user SET isdelete='1'
+		WHERE id=#{id};
+	</delete>
+	
+	<select id="getUserByName" resultType="DbUser">
+	
+		SELECT  *
+			FROM db_user u
+			WHERE u.user_account=#{user_account}
+		
+	</select>
+    <select id="queryIdUser" parameterType="int" resultType="DbUser">
+        SELECT  * from db_user WHERE  id=#{id}
+    </select>
+    
+    <update id="updatePasswd">
+    	UPDATE db_user 
+		<set>
+		user_password=#{user_password}
+    	</set>
+		 WHERE id=#{id};
+    </update>
+	
+	
+</mapper>

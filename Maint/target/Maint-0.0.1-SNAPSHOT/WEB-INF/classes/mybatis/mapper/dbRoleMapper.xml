@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.maint.role.mapper.IDbRoleMapper">
+
+	<select id="getRoleByUser" resultType="DbRole">
+		select
+   			 *
+    from db_user_role ur
+    INNER JOIN db_role r ON r.id=ur.roleId
+    WHERE ur.userId=#{userId}
+		
+	</select>
+	
+	<select id="findByUserName" resultType="DbRole">
+		
+	select r.* from dbo.db_role r
+	left join  dbo.db_user_role ur on(r.id = ur.roleId) 
+	left join db_user u on(u.id = ur.userId)
+	where u.user_account=#{userName}		
+
+	</select>
+	
+	
+	<select id="findRoleAll" resultType="DbRole">
+		
+			select * from dbo.db_role 
+			
+	</select>
+	
+	<select id="findAllByUserId" resultType="DbUserRole">
+		select * from db_user_role where userId=#{userId}
+		
+	</select>
+	
+	<insert id="addUserRole" parameterType="DbUserRole">
+		insert into db_user_role (userId,roleId)
+		values(#{userId},#{roleId});
+		
+	</insert>
+	
+	<update id="editUserRole" parameterType="DbUserRole">
+		
+		update db_user_role set roleId=#{roleId} where userId=#{userId}
+		
+	</update>
+	
+	
+
+</mapper>

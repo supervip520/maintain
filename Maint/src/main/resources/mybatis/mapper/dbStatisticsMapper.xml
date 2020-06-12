@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.maint.dict.mapper.IDbStatisticsMapper">
+	<!-- 查询语句 -->
+	<select id="listStatistics" resultType="DbStatistics">
+		SELECT * FROM db_statistics d where d.isdelete=0
+	</select>
+	<select id="listStatisticsMain" resultType="DbStatistics">
+		SELECT * FROM db_statistics d where d.isdelete=0 and pid=0
+	</select>
+	
+	<select id="findStatisticsById" resultType="DbStatistics">
+		SELECT * FROM db_statistics WHERE statisticsId=#{statisticsId}
+		
+	</select>
+	<!-- 插入语句 -->
+	<insert id="addStatistics">
+		insert into db_statistics
+		(statisticsName,statisticsNumber,statisticsEmp,statisticsSyu,supplierName,isdelete)values
+		(#{statisticsName},#{statisticsNumber},#{statisticsEmp},#{statisticsSyu},#{supplierName},0)
+	</insert>
+	<!-- 更新语句 -->
+	<update id="updateStatistics">
+		UPDATE db_statistics
+		<set>
+			<if test="statisticsName != null">statisticsName=#{statisticsName},</if>
+			<if test="statisticsNumber != null">statisticsNumber=#{statisticsNumber},</if>
+			<if test="statisticsEmp != null">statisticsEmp=#{statisticsEmp},</if>
+			<if test="statisticsSyu != null">statisticsSyu=#{statisticsSyu},</if>
+			<if test="supplierName != null">supplierName=#{supplierName},</if>
+			<if test="isdelete != null">isdelete=#{isdelete}</if>
+		</set>
+		WHERE statisticsId=#{statisticsId}
+	</update>
+	<!-- 删除语句 -->
+	<delete id="deleteStatistics">
+		UPDATE db_statistics SET isdelete='1'
+		WHERE statisticsId=#{statisticsId};
+	</delete>
+	
+	<select id="findAllByPid" resultType="DbStatistics">
+		
+		SELECT * FROM db_statistics d where pid=#{supplierName} and  d.isdelete=0 
+	
+	</select>
+</mapper>

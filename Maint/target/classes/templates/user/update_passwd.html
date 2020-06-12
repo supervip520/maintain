@@ -1,0 +1,52 @@
+<form id="restSelfFrm" class="form-horizontal">
+	<div class="form-group">
+		<label class="col-xs-12" for="oldPassword"><font color="red">*</font>旧密码：</label>
+		<div class="col-xs-12">
+			<input class="form-control" maxlength="16" type="password" id="oldPassword" placeholder="请输入旧密码" />
+			<div id="validation-oldPassword" class="validate-error help-block"></div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-xs-12 " for="newPassword"><font color="red">*</font>新密码：</label>
+		<div class="col-xs-12">
+			<input class="form-control" maxlength="32" type="password" id="newPassword" placeholder="请输入新密码" />
+			<div id="validation-newPassword" class="validate-error help-block"></div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-xs-12 " for="checkPassword"><font color="red">*</font>确认密码：</label>
+		<div class="col-xs-12">
+			<input class="form-control" maxlength="32" type="password" id="checkPassword" placeholder="请再次确认密码" />
+			<div id="validation-checkPassword" class="validate-error help-block"></div>
+		</div>
+	</div>
+</form>
+
+<script type="text/javascript">
+	function submit() {
+		frmValidate();
+		var newPassword = $("#newPassword").val();
+		var checkPassword = $("#checkPassword").val();
+		if(checkPassword != newPassword){	
+			frmFieldErr("checkPassword", "两次密码不一致");
+			return;
+		}
+		var oldPassword = $("#oldPassword").val();
+		$.ajax({
+			url : "user/updatePasswd",
+			data :{"newPassword": newPassword,"oldPassword": oldPassword},
+			type : "post",
+			dataType : "json",
+			success : function(req) {
+				if (req["msg"] == "修改成功") {
+					$.Mod.Close("");
+					$.Cfm("密码修改成功,请重新登录", function(){
+						window.location.href = "/logout";
+					})					
+				} else {
+					frmFieldErr("oldPassword", "旧密码不正确");
+				}
+			}
+		});
+    }
+</script>

@@ -1,0 +1,1272 @@
+﻿<!DOCTYPE HTML>
+<html lang="zh-cn" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<base href="/static">
+<link href="plugins/bootstrap-3.3.0/css/bootstrap.min.css" rel="stylesheet" />
+<link href="plugins/datetimepicker/bootstrap/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+<link href="plugins/fileinput/fileinput.min.css" rel="stylesheet">
+<link href="plugins/bootstrap-3.3.0/css/bootstrap-select.min.css" rel="stylesheet" />
+<link href="plugins/material-design-iconic-font-2.2.0/css/material-design-iconic-font.min.css" rel="stylesheet" />
+<link href="plugins/bootstrap-table-1.11.0/bootstrap-table.min.css" rel="stylesheet" />
+<link href="plugins/bootstrap-3.3.0/css/bootstrapValidator.css" rel="stylesheet" />
+<link href="plugins/waves-0.7.5/waves.min.css" rel="stylesheet" />
+<link href="plugins/jquery-confirm/jquery-confirm.min.css" rel="stylesheet" />
+<link href="css/common.css" rel="stylesheet" />
+<link href="css/table.css" rel="stylesheet" />
+<link href="css/toastr.css" rel="stylesheet" />	
+</head>
+<body>
+	<div id="main">
+		<div id="toolbar">
+				 <button class="btn btn-primary" id="add_table_btn" shiro:hasPermission="site:maintain:add"><i class="zmdi zmdi-plus"></i>新增维护信息</button>
+				 <!-- <button class="btn btn-primary" id="upd_table_btn" ><i class="zmdi zmdi-plus"></i>修改维护信息</button> -->
+				 <button class="btn btn-primary" shiro:hasPermission="site:maintain:del" id="del_table_btn"><i class="zmdi zmdi-close"></i>删除维护信息</button>
+				 <a class="btn btn-primary" href="javascript:history.back()"><i class="glyphicon glyphicon-arrow-left"></i>返回</a>
+		</div>
+		<table id="table"></table>
+	</div>
+	<!-- 新增 -->
+	<div class="modal fade bs-example-modal-md" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="myModal" data-backdrop="static">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">新增维护情况</h4>
+            </div>
+            <div class="modal-body">
+                <form  id="modalFormMaintain" class="form-horizontal">
+                	<input th:value="${siteid}" type="hidden" name="sitemainId"/>
+                    <div class="form-group" style="text-align: center;">
+                    <div class="col-md-6 col-xs-12">
+                    		<strong>维护情况:</strong><br>
+                          <select id="slpk" name="maintainId" required="required" class="selectpicker" data-width="100%"></select>
+                     </div>  
+                     <div class="col-md-6 col-xs-12">
+                     
+                     <strong>故障配件:</strong><br>
+                    	 <select id="faultpj" onchange="fault()"  name="faultTypeId"  class="selectpicker" multiple="multiple" data-width="100%"></select>
+                   <input id="faultpjname"   type="hidden"  name="faultTypeName"/>
+                     </div> 
+                    </div>
+                    <div class="form-group" style="text-align: center;">
+                     <div class="col-md-6 col-xs-12">
+                    		<strong>其他配件:</strong>
+                        <input type='text'  name="faultother"  class="form-control"/>
+                     </div> 
+                        <div class="col-md-6 col-xs-12">
+                    		<strong>维护人:</strong>
+                    		<select id="userMan"   name="maintainManId" class="selectpicker" multiple="multiple" data-width="100%"></select>
+                    		  <input id="maintainMan" type="hidden"   name="maintainMan"/>
+                     </div> 
+                    </div>
+                     <div class="form-group" style="text-align: center;">
+                     <div id="divcard" class="col-md-6 col-xs-12" style="display: none;" >
+                    		<strong>电话卡号:</strong>
+                        <input type='text'  placeholder="移动卡前面加yd,电信卡加dx。" name="card"  class="form-control"/>
+                     </div> 
+                    </div>
+                    <div class="form-group" style="text-align: center;">
+                    <div class="col-md-6 col-xs-12">
+                      <strong>故障时间:</strong>
+                  
+                   <input type='date' id="faultDate" name="faultDate" class="form-control"/>
+	               		
+                    		
+                     </div>  
+                     <div class="col-md-6 col-xs-12">
+                    		<strong>故障内容:</strong>
+                        <input type='text' id="faultContent" name="faultContent" required="required" class="form-control"/>
+                     </div> 
+                    </div>
+                    
+                    <div class="form-group" style="text-align: center;">
+                    <div id="divrtu" class="col-md-6 col-xs-12" style="display: none;" >
+                    		<strong>RTU供应商:</strong>
+                    		<select id="rtu" name="rtusupplierId" disabled="disabled"  class="selectpicker" data-width="100%"></select>
+                    		<input id="rtuname" type="hidden" name="rtusupplierName"/>
+                     </div>  
+                     <div id="divdtu" class="col-md-6 col-xs-12" style="display: none;" >
+                    		<strong>DTU供应商:</strong>
+                    		<select id="dtu" name="dtusupplierId" disabled="disabled" class="selectpicker" data-width="100%"></select>
+                    		<input id="dtuname"  type="hidden"  name="dtusupplierName"/>
+                     </div> 
+                    </div>
+                     <div class="form-group" style="text-align: center;">
+                    <div class="col-md-6 col-xs-12">
+                    		<strong>处理方法:</strong>
+                        <input type='text' name="resolvent" id="resolvent" required="required" class="form-control"/>
+                     </div>  
+                     <div class="col-md-6 col-xs-12">
+                    		<strong>备注:</strong>
+                        <input type='text'  name="remark"  class="form-control"/>
+                     </div> 
+                   
+                    </div>
+                      <div class="form-group" style="text-align: center;">
+                    <div class="col-md-6 col-xs-12">
+                    		<strong>现场图片:</strong>
+                        <input type="file" name="file1" id="file1"  required="required"  class="myfile"/> 
+                     </div>  
+                     <div class="col-md-6 col-xs-12">
+                    		<strong>现场图片:</strong>
+                        <input type="file" name="file2" id="file2"  required="required" class="myfile"/> 
+                     </div> 
+                    </div>
+                    
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="savaMaintain">保存</button>
+                 <button type="button" class="btn btn-default" id="closeModal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 修改 -->
+	<div class="modal fade bs-example-modal-md" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="updmyModal" data-backdrop="static">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">修改维护情况</h4>
+            </div>
+            <div class="modal-body">
+                <form  id="updmodalFormMaintain" class="form-horizontal">
+                	<input th:value="${siteid}" type="hidden" name="sitemainId"/>
+                    <div class="form-group" style="text-align: center;">
+                    <div class="col-md-6 col-xs-12">
+                    		<strong>维护情况:</strong><br>
+                          <select id="updslpk" name="maintainId" class="selectpicker" data-width="100%"></select>
+                     </div>  
+                     <div class="col-md-6 col-xs-12">
+                     
+                     <strong>故障配件:</strong><br>
+                    	 <select id="updfaultpj"  onchange="updfault()"  name="faultTypeId"  class="selectpicker" multiple="multiple" data-width="100%"></select>
+                   <input id="updfaultpjname"  type="hidden"  name="faultTypeName"/>
+                     </div> 
+                    </div>
+                    <div class="form-group" style="text-align: center;">
+                     <div class="col-md-6 col-xs-12">
+                    		<strong>其他配件:</strong>
+                        <input type='text' id="faultother" name="faultother"  class="form-control"/>
+                     </div> 
+                    </div>
+                    <div class="form-group" style="text-align: center;">
+                    <div class="col-md-6 col-xs-12">
+                      <strong>故障时间:</strong>
+                   
+                   <input type='date' id="updfaultDate" name="faultDate" class="form-control"/>
+	               	
+                    		
+                     </div>  
+                     <div class="col-md-6 col-xs-12">
+                    		<strong>故障内容:</strong>
+                        <input type='text' id="updfaultContent" name="faultContent" required="required" class="form-control"/>
+                     </div> 
+                    </div>
+                    
+                    <div class="form-group" style="text-align: center;">
+                    <div class="col-md-6 col-xs-12">
+                    		<strong>RTU供应商:</strong>
+                    		<select id="updrtu" name="rtusupplierId" disabled="disabled"  class="selectpicker" data-width="100%"></select>
+                    		<input id="updrtuname" type="hidden" name="rtusupplierName"/>
+                     </div>  
+                     <div class="col-md-6 col-xs-12">
+                    		<strong>DTU供应商:</strong>
+                    		<select id="upddtu" name="dtusupplierId" disabled="disabled" class="selectpicker" data-width="100%"></select>
+                    		<input id="upddtuname"  type="hidden"  name="dtusupplierName"/>
+                     </div> 
+                    </div>
+                     <div class="form-group" style="text-align: center;">
+                    <div class="col-md-6 col-xs-12">
+                    		<strong>处理方法:</strong>
+                        <input type='text' name="resolvent" id="updresolvent" required="required" class="form-control"/>
+                     </div>  
+                     <div class="col-md-6 col-xs-12">
+                    		<strong>维护人:</strong>
+                    		<select id="upduserMan" required="required" name="maintainManId" class="selectpicker" multiple="multiple" data-width="100%"></select>
+                    		  <input id="updmaintainMan"  type="hidden"  name="maintainMan"/>
+                     </div> 
+                    </div>
+                      <div class="form-group" style="text-align: center;">
+                    <div class="col-md-6 col-xs-12">
+                    		<strong>现场图片:</strong>
+                        <input type="file" name="file1" id="updfile1"  required="required"  class="myfile"/> 
+                     </div>  
+                     <div class="col-md-6 col-xs-12">
+                    		<strong>现场图片:</strong>
+                        <input type="file" name="file2" id="updfile2"  required="required" class="myfile"/> 
+                     </div> 
+                    </div>
+                    
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="updMaintain">保存</button>
+                 <button type="button" class="btn btn-default" id="updcloseModal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 显示大图模态框 -->
+<div class="modal fade text-center" id="showImgModal1">
+    <div class="modal-dialog modal-md" style="display: inline-block; width: auto;">
+        <div class="modal-content">
+            <img height="500px" width="400px"  id="showImage" src="">
+        </div>
+    </div>
+</div>
+<!-- 显示大图模态框 -->
+<div class="modal fade text-center" id="showImgModal2">
+    <div class="modal-dialog modal-md" style="display: inline-block; width: auto;">
+        <div class="modal-content">
+            <img height="500px" width="400px"  id="showImages" src="">
+        </div>
+    </div>
+</div>
+
+	<script src="plugins/jquery.1.12.4.min.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/bootstrap.min.js"></script>
+	<script src="plugins/datetimepicker/bootstrap/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="plugins/datetimepicker/bootstrap/js/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script src="plugins/fileinput/fileinput.min.js"></script>
+	<script src="plugins/fileinput/zh.js"></script>
+	<script src="plugins/bootstrap-table-1.11.0/bootstrap-table.min.js"></script>
+	<script src="plugins/bootstrap-table-1.11.0/locale/bootstrap-table-zh-CN.min.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/bootstrap-select.min.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/defaults-zh_CN.min.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/bootstrapValidator.js"></script>
+	<script src="plugins/bootstrap-3.3.0/js/zh_CN.js"></script>
+	<script src="plugins/waves-0.7.5/waves.min.js"></script>
+	<script src="plugins/jquery-confirm/jquery-confirm.min.js"></script>
+	<script src="plugins/export/bootstrap-table-export.js"></script>
+	<script src="plugins/export/tableExport.js"></script>
+	<script src="plugins/export/jquery.base64.js"></script>
+		<script src="js/toastr.min.js"></script>
+	<script src="js/common.js"></script>
+	<script th:inline="javascript">
+	toastr.options.positionClass = 'toast-top-center';
+	$(function() {
+		 $('#datetimepicker').datetimepicker({
+				 format:'yyyy-mm-dd',
+	            startView: "year", //初始化视图是‘年’
+	            minView: "month",//最精确视图为'月'
+	            language:'zh-CN',
+	            maxView: "decade"//最高视图为'十年'
+		    });
+		 $.fn.datetimepicker.dates['zh-CN'] = {
+		            days: ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"],
+		            daysShort: ["周日", "周一", "周二", "周三", "周四", "周五", "周六", "周日"],
+		            daysMin:  ["日", "一", "二", "三", "四", "五", "六", "日"],
+		            months: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+		            monthsShort: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+		            today: "今天",
+		            suffix: [],
+		            meridiem: ["上午", "下午"]
+		    };
+		
+	
+		
+		  
+		//图片上传
+		$(".myfile").fileinput({
+      uploadAsync : true, //默认异步上传
+      showUpload : false, //是否显示上传按钮,跟随文本框的那个
+      showRemove : false, //显示移除按钮,跟随文本框的那个
+      showCaption : true,//是否显示标题,就是那个文本框
+      showPreview : true, //是否显示预览,不写默认为true
+      dropZoneEnabled : false,//是否显示拖拽区域，默认不写为true，但是会占用很大区域
+      maxFileCount : 1, //表示允许同时上传的最大文件个数
+      enctype : 'multipart/form-data',
+      validateInitialCount : true,
+      previewFileIcon : "<i class='glyphicon glyphicon-king'></i>",
+      msgFilesTooMany : "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
+      language : 'zh'
+  })
+	});
+	 var siteid = [[${siteid}]];
+		var $table = $('#table');
+		$(function() {
+			$(document).on('focus', 'input[type="text"]', function() {
+				$(this).parent().find('label').addClass('active');
+			}).on('blur', 'input[type="text"]', function() {
+				if ($(this).val() == '') {
+					$(this).parent().find('label').removeClass('active');
+				}
+			});
+
+			$table.bootstrapTable({
+				url : '/maintain/listMaintain',
+				height : getHeight(),
+				striped : true,
+				search : true,
+				searchOnEnterKey : true,
+				showRefresh : true,
+				showToggle : false,
+				showColumns : false,
+				minimumCountColumns : 2,
+				showPaginationSwitch : false,
+				clickToSelect : true,
+				detailView : false,
+				detailFormatter : 'detailFormatter',
+				pagination : true,
+				paginationLoop : false,
+				classes : 'table table-hover table-no-bordered',
+				smartDisplay : false,
+				idField : 'id',
+				sortName : 'maintainDate',
+				sortOrder : 'desc',
+				escape : true,
+				searchOnEnterKey : true,
+				idField : 'systemId',
+				maintainSelected : true,
+				toolbar : '#toolbar',
+				//导出功能设置（关键代码）
+				exportDataType:'all',//'basic':当前页的数据, 'all':全部的数据, 'selected':选中的数据
+				showExport: true,  //是否显示导出按钮
+			    buttonsAlign:"right",  //按钮位置
+			    showExport: phoneOrPc(),
+			    exportTypes:['excel','xlsx'],  //导出文件类型，[ 'csv', 'txt', 'sql', 'doc', 'excel', 'xlsx', 'pdf']
+			    exportOptions: {//导出设置
+                    fileName: '维护情况',//下载文件名称
+                    ignoreColumn: [0]
+                },
+				queryParams : function(params) {
+					return { //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+						siteid : siteid
+					//这个是自定义的参数，共后台接受
+					}
+				},
+				columns : [ {
+					field : 'state',
+					checkbox : true
+				}, {
+					field : 'id',
+					title : '编号',
+					 visible: false
+				},{
+					field : 'sitemainId',
+					title : '站点编号',
+					sortable : true,
+					halign : 'center'
+				}, {
+					field : 'maintainId',
+					title : '维护情况',
+					sortable : true,
+					halign : 'center',
+					formatter: function (value, row, index) {
+						var main;
+						if(value=='1'){
+							var main = '<strong><span style="color:#3e8f3e;">已解决/已维护</span></strong>'; 
+						}else if(value=='2'){
+							var main = '<strong><span style="color:#fa9f00;">未解决/已维护</span></strong>'; 
+						}else{
+							var main = '<strong><span style="color:#c12e2a;">故障</span></strong>'; 
+						}
+	                    return main;
+	                }
+				}, {
+					field : 'faultDate',
+					title : '故障时间',
+					sortable : true,
+					halign : 'center',
+					formatter: function (value, row, index) {
+	                    return changeDateFormat(value)
+	                }
+				},  {
+					field : 'faultTypeName',
+					title : '故障配件',
+					sortable : true,
+					halign : 'center',
+					formatter: function (value, row, index) {
+						if(row.faultother==""  && value=="" ||  value==null)
+							{
+							return "";
+							}else if(row.faultother=="" && value!=""){
+								return value;
+							}else if(row.faultother!="" && value==""){
+								return row.faultother;
+							}else{
+								return value+","+row.faultother;
+							}
+	                    
+	                }
+				}, {
+					field : 'faultTypeId',
+					title : '故障配件ID',
+					sortable : true,
+					halign : 'center',
+					 visible: false
+				},{
+					field : 'rtusupplierId',
+					title : 'RTUID',
+					sortable : true,
+					halign : 'center',
+					visible: false
+				}, {
+					field : 'rtusupplierName',
+					title : 'RTUName',
+					sortable : true,
+					halign : 'center',
+					visible: false
+				},{
+					field : 'dtusupplierId',
+					title : 'DTUID',
+					sortable : true,
+					halign : 'center',
+					visible: false
+				},{
+					field : 'faultother',
+					title : '其他配件',
+					sortable : true,
+					halign : 'center',
+					visible: false
+				}, {
+					field : 'dtusupplierName',
+					title : 'DTUName',
+					sortable : true,
+					halign : 'center',
+					 visible: false
+				},{
+					field : 'faultContent',
+					title : '故障内容',
+					sortable : true,
+					halign : 'center'
+				}, {
+					field : 'resolvent',
+					title : '处理方法',
+					sortable : true,
+					halign : 'center'
+				}, {
+					field : 'maintainImg',
+					title : '现场图片',
+					sortable : true,
+					halign : 'center',
+					formatter:function (value,row,index)
+					{
+						 if(null!=value)
+							{
+							 return '<img  onclick="javascript:showimage(\''+value+'\');"  src="/upload/'+value+'" width="100" height="100" class="img-rounded" >&nbsp;&nbsp;&nbsp;<img  onclick="javascript:showimage(\''+row.maintainImgs+'\');"  src="/upload/'+row.maintainImgs+'" width="100" height="100" class="img-rounded" >';
+							}
+						 return "";
+					
+					}
+				},{
+					field : 'maintainMan',
+					title : '维护人',
+					sortable : true,
+					halign : 'center'
+				},{
+					field : 'maintainManId',
+					title : '维护人编号',
+					sortable : true,
+					halign : 'center',
+					visible: false
+	
+				},{
+					field : 'maintainDate',
+					title : '维护日期',
+					sortable : true,
+					halign : 'center',
+					formatter: function (value, row, index) {
+	                    return changeDateFormat(value)
+	                }
+				} ]
+			}).on('all.bs.table', function(e, name, args) {
+				$('[data-toggle="tooltip"]').tooltip();
+				$('[data-toggle="popover"]').popover();
+			});
+		});
+		function actionFormatter(value, row, index) {
+			return [
+					'<a class="like" href="javascript:void(0)" data-toggle="tooltip" title="添加"><i class="glyphicon glyphicon-heart"></i></a>　',
+					'<a class="edit ml10" href="javascript:void(0)" data-toggle="tooltip" title="修改"><i class="glyphicon glyphicon-edit"></i></a>　',
+					'<a class="remove ml10" href="javascript:void(0)" data-toggle="tooltip" title="删除"><i class="glyphicon glyphicon-remove"></i></a>' ]
+					.join('');
+		}
+		
+		/* 日期格式 */
+		function changeDateFormat(cellval) {
+			var dateVal = cellval + "";
+	        if (cellval != null) {
+	            var date = new Date(parseInt(dateVal.replace("/Date(", "").replace(")/", ""), 10));
+	            var month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
+	            var currentDate = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+	            
+	            var hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+	            var minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+	            var seconds = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
+	            
+	            return date.getFullYear() + "-" + month + "-" + currentDate + " " + hours + ":" + minutes + ":" + seconds;
+	        }
+        }
+		/* 日期格式 */
+		function DateFormat(cellval) {
+			var dateVal = cellval + "";
+	        if (cellval != null) {
+	            var date = new Date(parseInt(dateVal.replace("/Date(", "").replace(")/", ""), 10));
+	            var month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
+	            var currentDate = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+	            
+	            var hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+	            var minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+	            var seconds = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
+	            
+	            return date.getFullYear() + "-" + month + "-" + currentDate;
+	        }
+        }
+
+		function detailFormatter(index, row) {
+			var html = [];
+			$.each(row, function(key, value) {
+				html.push('<p><b>' + key + ':</b> ' + value + '</p>');
+			});
+			return html.join('');
+		}
+		
+		
+		/*判断终端是手机还是电脑--用于判断文件是否导出(电脑需要导出)*/
+		function phoneOrPc(){
+		var sUserAgent = navigator.userAgent.toLowerCase();
+		var bIsIpad = sUserAgent.match(/ipad/i) == "ipad";
+		var bIsIphoneOs = sUserAgent.match(/iphone os/i) == "iphone os";
+		var bIsMidp = sUserAgent.match(/midp/i) == "midp";
+		var bIsUc7 = sUserAgent.match(/rv:1.2.3.4/i) == "rv:1.2.3.4";
+		var bIsUc = sUserAgent.match(/ucweb/i) == "ucweb";
+		var bIsAndroid = sUserAgent.match(/android/i) == "android";
+		var bIsCE = sUserAgent.match(/windows ce/i) == "windows ce";
+		var bIsWM = sUserAgent.match(/windows mobile/i) == "windows mobile";
+		if (bIsIpad || bIsIphoneOs || bIsMidp || bIsUc7 || bIsUc || bIsAndroid || bIsCE || bIsWM) {
+		return false;
+		} else {
+		return true;
+		}
+		}
+		  
+		
+		
+		
+		//打开模态框
+		 var $addbtn = $("#add_table_btn");
+		//打开模态框
+		 var $updbtn = $("#upd_table_btn");
+		//关闭模态框
+		var $closemodal=$("#closeModal");
+		
+		//关闭模态框
+		var $updclosemodal=$("#updcloseModal");
+		
+		//保存模态框
+		var $savemodal=$("#savaMaintain");
+		
+		
+		
+		//删除
+		$("#del_table_btn").click(function (){
+
+			var rows = $table.bootstrapTable('getSelections');
+			if (rows.length == 0) {
+				$.confirm({
+					title : false,
+					content : '请至少选择一条记录！',
+					autoClose : 'cancel|3000',
+					backgroundDismiss : true,
+					buttons : {
+						cancel : {
+							text : '取消',
+							btnClass : 'waves-effect waves-button'
+						}
+					}
+				});
+			} else {
+				$.confirm({
+					type : 'red',
+					animationSpeed : 300,
+					title : false,
+					content : '确认删除该信息吗？',
+					buttons : {
+						confirm : {
+							text : '确认',
+							btnClass : 'waves-effect waves-button',
+							action : function() {
+								for (var i = rows.length - 1; i >= 0; i--) {
+					
+									id= rows[i].id;
+									$.ajax({
+										type : "POST",
+										url : "/maintain/delMaintain",
+										async : true,
+										contentType : "application/json",
+										data : JSON.stringify(id),
+										success : function(result) {
+											if (result["msg"] == "删除成功") {
+												$("#table").bootstrapTable('refresh');
+											} else {
+												toastr.error('删除失败');
+											}
+										}
+									});
+								}
+							}
+						},
+						cancel : {
+							text : '取消',
+							btnClass : 'waves-effect waves-button'
+						}
+					}
+				});
+			}
+		 }); 
+		
+		//显示大图    
+		   function showimage(img)
+		     {
+		         $("#showImgModal1").find("#showImage").attr("src","/upload/"+img+"");
+		         $("#showImgModal1").modal();
+		     }
+		 //显示大图    
+		   function showimages(img)
+		     {
+		         $("#showImgModal2").find("#showImages").attr("src","/upload/"+img+"");
+		         $("#showImgModal2").modal();
+		     }
+		
+		
+		//修改模态框
+		var $updMaintain=$("#updMaintain");
+
+		  $addbtn.click(function () {
+		        	//打开新增维护窗体
+		//维护情况下拉数据加载 
+
+		
+		  $.ajax({ 
+		   type : 'get', 
+		   url : "/data/weihqk.json", 
+		   dataType : 'json', 
+		   success : function(datas) {//返回list数据并循环获取 
+		    var select = $("#slpk"); 
+		    for (var i = 0; i < datas.length; i++) { 
+		     select.append("<option value='"+datas[i].id+"'>"
+		       + datas[i].text + "</option>"); 
+		    } 
+		    $('.selectpicker').selectpicker('val', ''); 
+		    $('.selectpicker').selectpicker('refresh'); 
+		   } 
+		  }); 
+		
+		
+		//故障配件下拉数据加载 
+		  $.ajax({ 
+		   type : 'get', 
+		   url : "/dict/listStatisticsMain", 
+		   dataType : 'json', 
+		   success : function(data) {//返回list数据并循环获取 
+		    var faultpjid = $("#faultpj"); 
+		     for (var i = 0; i < data.length; i++) { 
+		    	 faultpjid.append("<option value='"+data[i].statisticsId+"'>"
+		       + data[i].statisticsName + "</option>");
+		    } 
+		    $('#faultpj').selectpicker('val', ''); 
+		    $('#faultpj').selectpicker('refresh'); 
+		   }
+		  }); 
+		
+			//用户下拉数据加载 
+		  $.ajax({ 
+		   type : 'get', 
+		   url : "/user/listUser", 
+		   dataType : 'json', 
+		   success : function(data) {//返回list数据并循环获取 
+		    var userMan = $("#userMan"); 
+		     for (var i = 0; i < data.length; i++) { 
+		    	 userMan.append("<option value='"+data[i].id+"'>"
+		       + data[i].fullName + "</option>");  
+		    } 
+		    $('#userMan').selectpicker('val', ''); 
+		    $('#userMan').selectpicker('refresh'); 
+		   }
+		  }); 
+		        	
+		  $("#userMan").on('change', function () {
+			  var selected = "";
+			  $("#userMan :selected").each(function(){
+	        	     selected += $(this).text() + ",";
+	        	 });
+			  $("#maintainMan").val(selected);
+		  }); 
+
+		  
+	
+		/*   $("#faultpj").on('change', function () {
+	        	
+	     
+	        	 
+	        }); */
+	        
+	        $("#rtu").on('change', function () {
+	        	 $("#rtu :selected").each(function(){
+	        		 $("#rtuname").val($(this).text());
+	        	 });
+	        	
+	        });
+	        $("#dtu").on('change', function () {
+	        	 $("#dtu :selected").each(function(){
+	        		 $("#dtuname").val($(this).text());
+	        	 });
+	        	
+	        });
+	        
+	        $(".selectpicker").selectpicker({
+				noneSelectedText : '请选择'//默认显示内容
+			});    	
+						//打开新增窗体
+		                $("#myModal").modal();
+		 });
+		      
+	//打开修改维护窗体
+	   $updbtn.click(function () {
+		   var rows = $table.bootstrapTable('getSelections');
+			if (rows.length == 0) {
+				$.confirm({
+					title : false,
+					content : '请至少选择一条记录！',
+					autoClose : 'cancel|3000',
+					backgroundDismiss : true,
+					buttons : {
+						cancel : {
+							text : '取消',
+							btnClass : 'waves-effect waves-button'
+						}
+					}
+				});
+			}else if(rows.length >1){
+				
+				$.confirm({
+					title : false,
+					content : '最多选择一条记录！',
+					autoClose : 'cancel|3000',
+					backgroundDismiss : true,
+					buttons : {
+						cancel : {
+							text : '取消',
+							btnClass : 'waves-effect waves-button'
+						}
+					}
+				});
+				
+			}else{
+				if(rows[0].faultTypeId!=null)
+					{
+					faultTypeId = rows[0].faultTypeId.split(',');
+					
+					}
+			
+				 if(rows[0].rtusupplierId!=null && rows[0].rtusupplierId!=0 )
+					{
+					 $("#rpdrtu").removeAttr("disabled");
+					 $.ajax({ 
+		      			   type : 'get', 
+		      			   url : "/dict/findAllByPid", 
+		      			   dataType : 'json', 
+		      			   data:{'pid':'1'},
+		      			   success : function(data) {//返回list数据并循环获取 
+		      			    var rtu = $("#updrtu").val(""); 
+		      			    rtu.append("<option value=''>请选择</option>");  
+		      			     for (var i = 0; i < data.length; i++) { 
+		      			    	 rtu.append("<option value='"+data[i].id+"'>"
+		      			       + data[i].supplierName + "</option>");  
+		      			    	   $('#updrtu').selectpicker('refresh'); 
+		      			    } 
+		      			   $('#updrtu').selectpicker('val', rows[0].rtusupplierId); 
+						    $('#updrtu').selectpicker('refresh'); 
+						    $('#updrtu').selectpicker('render');
+		      			   }
+		      			  }); 
+					
+					} 
+				 
+				 if(rows[0].dtusupplierId!=null && rows[0].dtusupplierId!=0)
+					{
+					 $("#upddtu").removeAttr("disabled");
+					 $.ajax({ 
+		      			   type : 'get', 
+		      			   url : "/dict/findAllByPid", 
+		      			   dataType : 'json', 
+		      			   data:{'pid':'2'},
+		      			   success : function(data) {//返回list数据并循环获取 
+		      			    var rtu = $("#upddtu").val(""); 
+		      			    rtu.append("<option value=''>请选择</option>");  
+		      			     for (var i = 0; i < data.length; i++) { 
+		      			    	 rtu.append("<option value='"+data[i].id+"'>"
+		      			       + data[i].supplierName + "</option>");  
+		      			    	   $('#updrtu').selectpicker('refresh'); 
+		      			    } 
+		      			   $('#upddtu').selectpicker('val', rows[0].dtusupplierId); 
+						    $('#upddtu').selectpicker('refresh'); 
+						    $('#upddtu').selectpicker('render');
+		      			   }
+		      			  }); 
+					
+					} 
+			
+				  if(rows[0].maintainManId!=null)
+					{
+			
+					 upduserMan = rows[0].maintainManId.split(',');
+						//用户下拉数据加载 
+					  $.ajax({ 
+					   type : 'get', 
+					   url : "/user/listUser", 
+					   dataType : 'json', 
+					   success : function(data) {//返回list数据并循环获取 
+					    var userMan = $("#upduserMan"); 
+					     for (var i = 0; i < data.length; i++) { 
+					    	 userMan.append("<option value='"+data[i].id+"'>"
+					       + data[i].fullName + "</option>");  
+					    } 
+					    $('#upduserMan').selectpicker('val', upduserMan); 
+					    $('#upduserMan').selectpicker('refresh'); 
+					    $('#upduserMan').selectpicker('render');
+					   }
+					  }); 
+
+					} 
+
+				$("#updfaultpjname").val(rows[0].faultTypeName);
+				
+				$("#updfaultDate").val(DateFormat(rows[0].faultDate));
+				$("#updfaultContent").val(rows[0].faultContent);
+				$("#updrtu").val(rows[0].rtusupplierId);
+				$("#updrtuname").val(rows[0].rtusupplierName);
+				$("#upddtu").val(rows[0].dtusupplierId);
+				$("#upddtuname").val(rows[0].dtusupplierName);
+				$("#updresolvent").val(rows[0].resolvent);
+				$("#upduserMan").val(rows[0].userMan);
+				$("#updmaintainMan").val(rows[0].maintainMan);
+				$("#faultother").val(rows[0].faultother);
+				
+			
+				
+				//维护情况下拉数据加载 
+				  $.ajax({ 
+				   type : 'get', 
+				   url : "/data/weihqk.json", 
+				   dataType : 'json', 
+				   success : function(datas) {//返回list数据并循环获取 
+				    var select = $("#updslpk"); 
+				    for (var i = 0; i < datas.length; i++) { 
+				     select.append("<option value='"+datas[i].id+"'>"
+				       + datas[i].text + "</option>"); 
+				    } 
+				    $('#updslpk').selectpicker('val', rows[0].maintainId); 
+				    $('#updslpk').selectpicker('refresh'); 
+				   } 
+				  }); 
+				
+				
+				//故障配件下拉数据加载 
+				  $.ajax({ 
+				   type : 'get', 
+				   url : "/dict/listStatistics", 
+				   dataType : 'json', 
+				   success : function(data) {//返回list数据并循环获取 
+				    var faultpjid = $("#updfaultpj"); 
+				     for (var i = 0; i < data.length; i++) { 
+				    	 faultpjid.append("<option value='"+data[i].statisticsId+"'>"
+				       + data[i].statisticsName + "</option>");
+				    } 
+				    $('#updfaultpj').selectpicker('val', faultTypeId); 
+				    $('#updfaultpj').selectpicker('refresh'); 
+				    $('#updfaultpj').selectpicker('render');
+				   }
+				  }); 
+				
+				
+		
+				
+				
+				
+				
+				
+				        	
+				  $("#upduserMan").on('change', function () {
+					  var selected = "";
+					  $("#upduserMan :selected").each(function(){
+			      	     selected += $(this).text() + ",";
+			      	 });
+					  $("#updmaintainMan").val(selected);
+				  }); 
+
+				  
+				  
+				
+			      
+			      $("#updrtu").on('change', function () {
+			      	 $("#updrtu :selected").each(function(){
+			      		 $("#updrtuname").val($(this).text());
+			      	 });
+			      	
+			      });
+			      $("#upddtu").on('change', function () {
+			      	 $("#upddtu :selected").each(function(){
+			      		 $("#upddtuname").val($(this).text());
+			      	 });
+			      	
+			      });
+			      
+			      $(".selectpicker").selectpicker({
+						noneSelectedText : '请选择'//默认显示内容
+					});    	
+								//打开修改窗体
+				                $("#updmyModal").modal();
+				
+				
+				
+				
+			}
+		   
+	
+	        	
+	
+	 }); 
+	      
+		      
+		 
+		        $closemodal.click(function () {
+	                $("#myModal").modal("hide");
+	                //关闭模态框后清空填写的数据
+	                document.getElementById("modalFormMaintain").reset();
+	                $(".selectpicker").empty();
+   	    			 $('.selectpicker').selectpicker('val', ''); 
+	    		    $('.selectpicker').selectpicker('refresh'); 
+	        });
+		       
+		        $updclosemodal.click(function () {
+	                $("#updmyModal").modal("hide");
+	                //关闭模态框后清空填写的数据
+	                document.getElementById("updmodalFormMaintain").reset();
+	                $(".selectpicker").empty();
+   	    			 $('.selectpicker').selectpicker('val', ''); 
+	    		    $('.selectpicker').selectpicker('refresh'); 
+	        });
+		
+		     $savemodal.click(function () {
+		    	 var formData = new FormData($("#modalFormMaintain")[0]);
+		    	 
+		    	 var maintain={};
+		    	 maintain.maintainId=$("#slpk").val();
+		    	 maintain.faultTypeId=$("#faultpj").val();
+		    	 maintain.faultpjname=$("#faultpjname").val();
+		    	 maintain.faultDate=$("#faultDate").val();
+		    	 maintain.faultContent=$("#faultContent").val();
+		    	 maintain.rtusupplierId=$("#rtu").val();
+		    	 maintain.rtusupplierName=$("#rtuname").val();
+		    	 maintain.dtusupplierId=$("#dtu").val();
+		    	 maintain.dtusupplierName=$("#dtuname").val();
+		    	 maintain.resolvent=$("#resolvent").val();
+		    	 maintain.maintainManId=$("#userMan").val();
+		    	 maintain.maintainMan=$("#maintainMan").val();
+		    	  var file1=$("#file1").val();
+		    	  var file2= $("#file2").val();
+		    	  if(null==maintain.maintainId)
+		    		{
+		    		  $("#slpk").focus();
+		    		 return false;
+		    		 }else if(maintain.resolvent=="")
+		    			 {
+		    			 $("#resolvent").focus();
+		    			 return false;
+		    			 }else if(null== maintain.maintainManId)
+		    			 {
+		    				 $("#userMan").focus();
+			    			 return false;
+			    			 }else if(file1=="" || file2=="" )
+			    			 {
+			    				 toastr.warning('现场图片不能低于俩张!');
+				    			 return false;
+				    		 }
+		    	 
+		    	 
+		    	 $.ajax({
+		    	        //接口地址
+		    	        url: '/maintain/addMaintain',
+		    	        type: 'POST',
+		    	        data: formData,
+		    	        async: false,
+		    	        cache: false,
+		    	        contentType: false,
+		    	        processData: false,
+		    	        success: function (result) {
+		    	        	toastr.success(result);
+		    	        	$("#table").bootstrapTable('refresh');
+		    	        	$("#cstable").bootstrapTable('refresh');
+		    	        	$("#myModal").modal("hide");
+			                //关闭模态框后清空填写的数据
+			                document.getElementById("modalFormMaintain").reset();
+			                $(".selectpicker").empty();
+		    	    		 $('.selectpicker').selectpicker('val', ''); 
+			    		    $('.selectpicker').selectpicker('refresh'); 
+		    	            //成功的回调
+
+		    	        },
+		    	        error: function (returndata) {
+		    	           //请求异常的回调
+		    	           // modals.warn("网络访问失败，请稍后重试!");
+		    	           toastr.error('网络访问失败，请稍后重试!');
+		    	           $("#myModal").modal("hide");
+			                //关闭模态框后清空填写的数据
+			                document.getElementById("modalFormMaintain").reset();
+			                $(".selectpicker").empty();
+		    	    		 $('.selectpicker').selectpicker('val', ''); 
+			    		    $('.selectpicker').selectpicker('refresh'); 
+		    	        }
+		    	    });
+		    	 
+		    	 
+		        });
+		    
+		        $('#myModal').on('hide.bs.modal', function () {
+				 document.getElementById("modalFormMaintain").reset();
+		            $(".selectpicker").empty();
+		   			 $('.selectpicker').selectpicker('val', ''); 
+				    $('.selectpicker').selectpicker('refresh'); 
+			
+		   });
+		      
+		    $('#updmyModal').on('hide.bs.modal', function () {
+				 document.getElementById("updmodalFormMaintain").reset();
+		            $(".selectpicker").empty();
+		   			 $('.selectpicker').selectpicker('val', ''); 
+				    $('.selectpicker').selectpicker('refresh'); 
+		   }); 
+		    
+		     
+		     function fault(){
+		    	 var selected="";
+		        	var faultName="";
+		        	 $("#faultpj :selected").each(function(){
+		        	     selected += $(this).val() + ",";
+		        	     faultName+=$(this).text()+",";
+		        	 });
+		        	 $("#faultpjname").val(faultName);
+		        	 if(faultName.search("RTU") != -1)
+	    	    	 {
+		        		 
+		        		 document.getElementById("divrtu").style.display="";
+		        		 $("#rtu").removeAttr("disabled")
+		        		 $("#rtu").empty();
+		        	
+		        		 $.ajax({ 
+		        			   type : 'get', 
+		        			   url : "/dict/findAllByPid", 
+		        			   dataType : 'json', 
+		        			   data:{'pid':'1'},
+		        			   success : function(data) {//返回list数据并循环获取 
+		        			    var rtu = $("#rtu").val(""); 
+		        			    rtu.append("<option value=''>请选择</option>");  
+		        			     for (var i = 0; i < data.length; i++) { 
+		        			    	 rtu.append("<option value='"+data[i].statisticsId+"'>"
+		        			       + data[i].statisticsName + "</option>");  
+		        			    	   $('#rtu').selectpicker('refresh'); 
+		        			    }
+		        			  
+		        			 
+		        			   }
+		        			  }); 
+		       
+	    	    	 }else{
+	    	    		 document.getElementById("divrtu").style.display="none";
+	    	    		 $("#rtu").empty();
+	    	    		 $('#rtu').selectpicker('val', ''); 
+	    	    		 $("#rtuname").val("");
+	    	       		 $('#rtu').prop('disabled', true);
+	    	       		 
+	    	    	 }
+		        	  if(faultName.search("DTU") != -1)
+	    	    	 {
+		        		  document.getElementById("divdtu").style.display="";
+		        		 $("#dtu").removeAttr("disabled")
+		        		  $("#dtu").empty();
+		        	
+		        		 $.ajax({ 
+		        			   type : 'get', 
+		        			   url : "/dict/findAllByPid", 
+		        			   dataType : 'json', 
+		        			   data:{'pid':'2'},
+		        			   success : function(data) {//返回list数据并循环获取 
+		        			    var dtu = $("#dtu"); 
+		        			    dtu.append("<option value=''>请选择</option>");  
+		        			     for (var i = 0; i < data.length; i++) { 
+		        			    	 dtu.append("<option value='"+data[i].statisticsId+"'>"
+		        			       + data[i].statisticsName + "</option>");  
+		        			    	 $('#dtu').selectpicker('refresh'); 
+		        			    } 
+		        			  
+		        			   }
+		        			  }); 
+		  
+	    	    	 }else{
+	    	    		 document.getElementById("divdtu").style.display="none";
+	    	    		  $("#dtu").empty();
+	    	    		  $('#dtu').selectpicker('val', ''); 
+	    	    		  $("#dtuname").val("");
+	    	       		 $('#dtu').prop('disabled', true);
+	    	    	 } 
+		        	  
+		        	  
+		        	  if(faultName.search("电话卡") != -1)
+		    	    	 {
+			        		  document.getElementById("divcard").style.display="";
+		    	    	 }else{
+		    	    		 document.getElementById("divcard").style.display="none";
+		    	    		 
+		    	    	 }
+		    	 
+		     }
+		     
+		     function updfault()
+		     {
+		    	 
+
+			      	var selected = "";    
+			      	var faultName="";
+			      	 $("#updfaultpj :selected").each(function(){
+			      	     selected += $(this).val() + ",";
+			      	     faultName+=$(this).text()+",";
+			      	 });
+			      	 $("#updfaultpjname").val(faultName);
+			      	 if(selected.search("1") != -1)
+				    	 {
+			      		 $("#updrtu").removeAttr("disabled")
+			      		 $("#updrtu").empty();
+			      		 $.ajax({ 
+			      			   type : 'get', 
+			      			   url : "/dict/findAllcombox", 
+			      			   dataType : 'json', 
+			      			   data:{'statisticsId':'1'},
+			      			   success : function(data) {//返回list数据并循环获取 
+			      			    var rtu = $("#updrtu").val(""); 
+			      			    rtu.append("<option value=''>请选择</option>");  
+			      			     for (var i = 0; i < data.length; i++) { 
+			      			    	 rtu.append("<option value='"+data[i].id+"'>"
+			      			       + data[i].supplierName + "</option>");  
+			      			    	   $('#updrtu').selectpicker('refresh'); 
+			      			    } 
+			      			 
+			      			   }
+			      			  }); 
+			      		 
+			      		 
+				    	 }else{
+				    		 $("#updrtu").empty();
+				    		 $('#updrtu').selectpicker('val', ''); 
+				    		 $("#updrtuname").val("");
+				       		 $('#updrtu').prop('disabled', true);
+				       		 
+				    	 }
+			      	 if(selected.search("2") != -1)
+				    	 {
+			      		 $("#upddtu").removeAttr("disabled")
+			      		  $("#upddtu").empty();
+			      		 $.ajax({ 
+			      			   type : 'get', 
+			      			   url : "/dict/findAllcombox", 
+			      			   dataType : 'json', 
+			      			   data:{'statisticsId':'2'},
+			      			   success : function(data) {//返回list数据并循环获取 
+			      			    var dtu = $("#upddtu"); 
+			      			    dtu.append("<option value=''>请选择</option>");  
+			      			     for (var i = 0; i < data.length; i++) { 
+			      			    	 dtu.append("<option value='"+data[i].id+"'>"
+			      			       + data[i].supplierName + "</option>");  
+			      			    	 $('#upddtu').selectpicker('refresh'); 
+			      			    } 
+			      			   }
+			      			  }); 
+			      		 
+			      		 
+				    	 }else{
+				    		  $("#upddtu").empty();
+				    		  $('#upddtu').selectpicker('val', ''); 
+				    		  $("#upddtuname").val("");
+				       		 $('#upddtu').prop('disabled', true);
+				    	 }
+		     }
+		
+		     
+		     $updMaintain.click(function () {
+		    	 var formData = new FormData($("#updmodalFormMaintain")[0]);
+		    	 
+		    	 var maintain={};
+		    	 maintain.maintainId=$("#updslpk").val();
+		    	 maintain.resolvent=$("#updresolvent").val();
+		    	 maintain.maintainManId=$("#upduserMan").val();
+		    	  var file1=$("#updfile1").val();
+		    	  var file2= $("#updfile2").val();
+		    	  if(null==maintain.maintainId)
+		    		{
+		    		  toastr.warning('维护情况不能为空，请选择维护情况!');
+		    		 return false;
+		    		 }else if(maintain.resolvent=="")
+		    			 {
+		    			 toastr.warning('处理方法不能为空!');
+		    			 return false;
+		    			 }else if(null== maintain.maintainManId)
+		    			 {
+		    				 toastr.warning('维护人不能为空!');
+			    			 return false;
+			    			 }else if(file1=="" || file2=="" )
+			    			 {
+			    				 toastr.warning('现场图片不能低于俩张!');
+				    			 return false;
+				    		 }
+		    	 
+		    	 
+		    	 $.ajax({
+		    	        //接口地址
+		    	        url: '/maintain/addMaintain',
+		    	        type: 'POST',
+		    	        data: formData,
+		    	        async: false,
+		    	        cache: false,
+		    	        contentType: false,
+		    	        processData: false,
+		    	        success: function (result) {
+		    	        	toastr.success(result);
+		    	        	$("#table").bootstrapTable('refresh');
+		    	        	$("#cstable").bootstrapTable('refresh');
+		    	        	$("#myModal").modal("hide");
+			                //关闭模态框后清空填写的数据
+			                document.getElementById("modalFormMaintain").reset();
+			                $(".selectpicker").empty();
+		    	    		 $('.selectpicker').selectpicker('val', ''); 
+			    		    $('.selectpicker').selectpicker('refresh'); 
+		    	            //成功的回调
+
+		    	        },
+		    	        error: function (returndata) {
+		    	           //请求异常的回调
+		    	           // modals.warn("网络访问失败，请稍后重试!");
+		    	       toastr.error('网络访问失败，请稍后重试!');
+		    	           $("#myModal").modal("hide");
+			                //关闭模态框后清空填写的数据
+			                document.getElementById("modalFormMaintain").reset();
+			                $(".selectpicker").empty();
+		    	    		 $('.selectpicker').selectpicker('val', ''); 
+			    		    $('.selectpicker').selectpicker('refresh'); 
+		    	        }
+		    	    });
+		    	 
+		    	 
+		        });
+		     
+		     
+	</script>
+</body>
+</html>

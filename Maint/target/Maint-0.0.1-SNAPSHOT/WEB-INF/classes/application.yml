@@ -1,0 +1,25 @@
+server:
+  port: 80
+  servlet:
+    context-path: /
+spring:
+  datasource:
+    url: jdbc:sqlserver://localhost:1433;databaseName=jz
+    username: sa
+    password: jzkj@2019
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  mvc:
+    static-path-pattern: /**
+  devtools:
+    restart:
+      enabled: true
+      additional-paths:
+      - src/main/java
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  thymeleaf:
+    prefix: classpath:/templates/  #prefix：指定模板所在的目录
+    cache: false
+    suffix: .html

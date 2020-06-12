@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.maint.site.mapper.IDbSiteinformationMapper">
+
+	<!-- 站点地图显示 -->
+	<select id="GDAll" resultType="DbSiteinformation"
+		parameterType="string">
+		select * from db_siteinformation
+		<where>
+			and isdelete =0
+			<if test="_parameter!=null and _parameter!='' ">
+				and siteTypeName like '%${_parameter}%'
+			</if>
+		</where>
+	</select>
+
+	<!-- 站点表格显示 -->
+	<select id="findsiteAll" resultType="DbSiteinformation"
+		parameterType="java.util.Map">
+		select *
+		from db_siteinformation s
+		<where>
+				and s.isdelete =0
+			<if test="siteTypeName!=null and siteTypeName!=''">
+				and s.siteTypeName = '${siteTypeName}'
+			</if>
+		</where>
+	</select>
+	
+		<!-- 站点表格显示 -->
+	<select id="findsitesearch" resultType="DbSiteinformation">
+		select *
+		from db_siteinformation s
+		<where>
+				and s.isdelete =0
+		</where>
+	</select>
+
+	<select id="getSiteByidSiteid" resultType="DbSiteinformation">
+		select * from
+		db_siteinformation where siteId=#{siteId}
+	</select>
+
+
+	<update id="updateSiteMain">
+		update db_siteinformation
+		<set>
+			<if test="siteName !=null">
+				siteName=#{siteName},
+			</if>
+			<if test="jd !=null ">
+				jd=#{jd},
+			</if>
+			<if test="wd !=null ">
+				wd=#{wd},
+			</if>
+			<if test="riversName !=null ">
+				riversName=#{riversName},
+			</if>
+			<if test="siteTypeName !=null">
+				siteTypeName=#{siteTypeName},
+			</if>
+			<if test="siteAddress !=null ">
+				siteAddress=#{siteAddress},
+			</if>
+			<if test="remark !=null ">
+				remark=#{remark},
+			</if>
+			<if test="equipment !=null ">
+				equipment=#{equipment},
+			</if>
+			<if test="maintainsId !=null ">
+				maintainsId=#{maintainsId},
+			</if>
+			<if test="maintainDate !=null">
+				maintainDate=GETDATE()
+			</if>
+
+		</set>
+		where siteId =#{siteId}
+
+	</update>
+
+	<insert id="addSite">
+		insert into
+		db_siteinformation(siteId,siteName,riversName,siteTypeName,jd,wd,siteAddress,remark,equipment,isdelete)values
+		(#{siteId},#{siteName},#{riversName},#{siteTypeName},#{jd},#{wd},#{siteAddress},#{remark},#{equipment},0)
+	</insert>
+	
+	<update id="deleteSite">
+	update db_siteinformation set isdelete ='1'
+	where siteId =#{siteId}
+	
+	</update>
+	
+
+</mapper>
